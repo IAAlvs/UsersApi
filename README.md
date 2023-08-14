@@ -1,6 +1,6 @@
-# SoftiaData App Documentation
+# Users Api Documentation
 
-This documentation provides an overview of how to use and work with the Softiadata App.
+This documentation provides an overview of how to use and work with the Users Api.
 
 ## Table of Contents
 - [Installation](#installation)
