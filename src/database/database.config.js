@@ -9,7 +9,7 @@ const {username, password, database, host, dialect, port} = dbConfig;
 const sequelize = new Sequelize(database, username, password, {
     host,
     dialect,
-    port,
+    port, // Puerto por defecto de PostgreSQL
     logging : false
 });
 

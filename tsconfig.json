@@ -29,11 +29,6 @@
       "./__tests__/typings",
       "./node_modules/@types/"
     ],
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
     "paths": {
       "@/*": [
         "./src/*"
@@ -42,6 +37,7 @@
   },
   "include": [
     "**/*.ts",
+    "src/*.ts"
   ],
   "exclude": [
     "node_modules"

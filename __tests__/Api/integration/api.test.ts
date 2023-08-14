@@ -4,16 +4,15 @@ import { sequelize } from "../../../src/database/database.config";
 import { User } from "../../../src/api/models/user";
 import { UserFiles } from "../../../src/api/models/user-file";
 import {getTestToken, configureEnvv} from "../utils/generateTestPayload";
+const authDependency =  require("../../../src/api/middlewares/Authorization/AuthorizationMiddleware");
 import { JsonWebTokenError } from "jsonwebtoken";
 import { CreateUserResponseDto } from "@/api/controllers/userController";
-//TO MOCK DEPENDENCY WAY 
-const authDependency =  require("../../../src/api/middlewares/Authorization/AuthorizationMiddleware");
 
 
 // Mock the 'database.js' module that imports Sequelize
 //change environment to test
 let token:string; 
-let configureEnv: Record<string, object>;
+let configureEnv:Record<string, object>;
 process.env.TEST_ENV = "test";
 describe('Integration Tests', () => {
   beforeAll(async () =>{
