@@ -5,12 +5,10 @@
     "lib": [
       "es6",
     ],
-    "allowJs": true,
-    "skipLibCheck": true,
     "strict": true,
     "noImplicitAny": true,
     "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
+    "noEmit": false,
     "types": [
       "jest",
       "node"
@@ -18,11 +16,10 @@
     "esModuleInterop": true,
     "module": "CommonJS",
     "moduleResolution": "node",
-    "checkJs": false,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
+    "checkJs": true,
+    "allowJs": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "typeRoots": [
@@ -37,13 +34,10 @@
   },
   "include": [
     "**/*.ts",
-    "src/*.ts"
+    "src/**/*.ts",
+    "!test/**/*"
   ],
   "exclude": [
     "node_modules"
-  ],
-  "ts-node": {
-    "transpileOnly": true,
-    "files": true
-  }
+  ]
 }

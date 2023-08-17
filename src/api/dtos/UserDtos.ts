@@ -10,8 +10,8 @@ export interface GetUserResponseDto{
     secondLastName? : string,
     age? : number,
     address? : string,
-    createdAt : Date,
-    updatedAt : Date
+    createdAt? : Date,
+    updatedAt? : Date
 }
 export interface FileDto{
     id : UUID,

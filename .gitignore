@@ -44,3 +44,5 @@ jspm_packages
 *.vscode
 #swagger
 swagger.json
+#build
+dist

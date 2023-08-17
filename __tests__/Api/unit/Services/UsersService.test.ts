@@ -1,5 +1,5 @@
 
-import { sequelize } from "../../../../src/database/database.config";
+import { sequelize } from "../../../../src/database/sequelize.config";
 import { User } from "../../../../src/api/models/user";
 import { UserFiles } from "../../../../src/api/models/user-file";
 import { UserServiceInterface } from "@/api/interfaces/UserServiceInterface";
@@ -46,7 +46,7 @@ describe('User Service Tests', () => {
       address : "Address example"
     }
     
-    /* '61ad624c-7233-4839-8ece-49fe0e3041be' */
+    // '61ad624c-7233-4839-8ece-49fe0e3041be'
     const fileToAdd = {
       userId : '61ad624c-7233-4839-8ece-49fe0e3041ce',
       fileId : '62ad624c-7233-4839-8ece-49fe0e3041ce',
@@ -99,8 +99,8 @@ describe('User Service Tests', () => {
     expect(response.lastName).toEqual(expectedUser.lastName);
     expect(response.secondLastName).toEqual(expectedUser.secondLastName);
     expect(response.address).toEqual(expectedUser.address);
-    expect(datesAreEqualWithinRange(response.createdAt, expectedUser.createdAt)).toBe(true);
-    expect(datesAreEqualWithinRange(response.updatedAt, expectedUser.updatedAt)).toBe(true);
+    expect(datesAreEqualWithinRange(response.createdAt!, expectedUser.createdAt!)).toBe(true);
+    expect(datesAreEqualWithinRange(response.updatedAt!, expectedUser.updatedAt!)).toBe(true);
   })
   test("WithInexistenceUserId_GetUser_Null", async () =>{
     const userId = '61ad624c-7233-4839-8ece-49fe0e3041ca';
@@ -157,8 +157,8 @@ describe('User Service Tests', () => {
       expect(userRetrieved.lastName).toEqual(expectedUsers[i].lastName);
       expect(userRetrieved.secondLastName).toEqual(expectedUsers[i].secondLastName);
       expect(userRetrieved.address).toEqual(expectedUsers[i].address);
-      expect(datesAreEqualWithinRange(userRetrieved.createdAt, expectedUsers[i].createdAt)).toBe(true);
-      expect(datesAreEqualWithinRange(userRetrieved.updatedAt, expectedUsers[i].updatedAt)).toBe(true);
+      expect(datesAreEqualWithinRange(userRetrieved.createdAt!, expectedUsers[i].createdAt!)).toBe(true);
+      expect(datesAreEqualWithinRange(userRetrieved.updatedAt!, expectedUsers[i].updatedAt!)).toBe(true);
     })
 
   })
@@ -229,7 +229,7 @@ describe('User Service Tests', () => {
     expect(response.userId).toBe("61ad624c-7233-4839-8ece-49fe0e3041be");
     expect(response.files).toHaveLength(0);
   })
-  /* Test UploadUserFiles */
+  // Test UploadUserFiles
   test("WithValidObject_UploadUserFile_FileAdded", async () =>{
     const userId = '61ad624c-7233-4839-8ece-49fe0e3041ce'
     const uploadFileObj : PostUserFileRequestDto = {
@@ -262,7 +262,7 @@ describe('User Service Tests', () => {
     expect(response.userId).toBe("61ad624c-7233-4839-8ece-49fe0e3041be");
     expect(response.files).toHaveLength(0);
   })
-  /* Test UploadUserFiles */
+  // Test UploadUserFiles
   test("WithInexistenceUser_UploadUserFile_Error", async () =>{
     const userId = '61ad624c-7233-4839-8ece-49fe0e3041rm';
 
@@ -293,7 +293,7 @@ describe('User Service Tests', () => {
     await expect(addFileCallback).rejects.toThrow(ReferenceError)
   });
 
-  /* Test Create userUser */
+  // Test Create userUser
   test("WithValidObject_CreateUser_UserCreated", async () =>{
     const userId = '61ad624c-7233-4839-8ece-49fe0e3041ce'
     const createUser : CreateUserRequestDto = {

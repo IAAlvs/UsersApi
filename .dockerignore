@@ -1,0 +1,12 @@
+# General files
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Specific files
+Dockerfile
+.dockerignore
+
+#Others
+github
+__tests__

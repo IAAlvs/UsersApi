@@ -1,6 +1,6 @@
 import request from "supertest";
 import app from "../../../src/api/server";
-import { sequelize } from "../../../src/database/database.config";
+import { sequelize } from "../../../src/database/sequelize.config.js";
 import { User } from "../../../src/api/models/user";
 import { UserFiles } from "../../../src/api/models/user-file";
 import {getTestToken, configureEnvv} from "../utils/generateTestPayload";
