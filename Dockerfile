@@ -1,19 +1,28 @@
-FROM node:18
+# Use a newer version of Node.js
+FROM node:18-alpine
 
-# Create app directory
-WORKDIR /usr/src/app
+# Create the application directory
+WORKDIR /app
 
-# Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
+# Copy application configuration files
 COPY package*.json ./
+COPY tsconfig.json ./
 
-RUN npm install
-# If you are building your code for production
-# RUN npm ci --omit=dev
+# Install dependencies (excluding dev dependencies)
+RUN npm ci --omit=dev
 
-# Bundle app source
+# Copy compiled files to the container
 COPY . .
 
+# Install TypeScript globally
+RUN npm install -g typescript
+
+# Compile TypeScript code
+RUN npm run build
+
+# Expose the port
 EXPOSE 8080
-CMD [ "node", "server.js" ]
+
+
+# Run the server
+CMD [ "node", "dist/api/server.js" ]

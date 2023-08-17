@@ -1,7 +1,7 @@
 import express,{Response}  from "express";
 import { RegisterRoutes } from "./routes/routes";
 import AddMiddlewares from "./middlewares/AddMiddlewares";
-import {databaseSetup} from "../database/database.config";
+import {databaseSetup} from "../database/sequelize.config";
 import errorHandler from "./utils/ErrorHandler";
 const expressPort = process.env.EXPRESS_SERVER_PORT || 4000;
 const environment:string = process.env.NODE_ENV || 'development';

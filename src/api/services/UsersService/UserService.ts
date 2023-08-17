@@ -4,7 +4,7 @@ import {User} from  "../../models/user";
 import { UserFiles } from '../../models/user-file';
 import { CreateUserRequestDto, GetUserFilesDtoResponse, GetUserResponseDto, PatchUserRequestDto, PostUserFileRequestDto, PostUserFileResponseDto} from "../../dtos/UserDtos";
 import crypto, { UUID } from "crypto";
-import { Sequelize } from 'sequelize';
+import { Sequelize, Op } from 'sequelize';
 @injectable()
 export class UserService implements UserServiceInterface {
 
@@ -20,13 +20,15 @@ export class UserService implements UserServiceInterface {
     return response;
   }
   public async getUsers(): Promise<GetUserResponseDto[]> {
-    const users: User[] | null = await User.findAll();
+    const users: User[] | null = await User.findAll({});
       if(users == null){
         return[];
       }
-      const response: GetUserResponseDto[] = users.map(({id, authId, email, emailVerified, picture, name, lastName,
-         secondLastName, age, address,CreatedAt, UpdatedAt}):
+    const values = users
+      const response: GetUserResponseDto[] = users.map(({dataValues}):
        GetUserResponseDto => {
+        const {id, authId, email, emailVerified, picture, name, lastName,
+          secondLastName, age, address,CreatedAt, UpdatedAt} = dataValues;
         return {
           id, authId, email, emailVerified, picture, name, lastName, secondLastName, age, address,
             createdAt: CreatedAt, updatedAt: UpdatedAt  
@@ -50,7 +52,6 @@ export class UserService implements UserServiceInterface {
         userId: user.dataValues.id,
         files : []
       });}
-
     const files = userFiles.map( ({dataValues})=> {
       return{
         id : dataValues.fileId,
@@ -114,9 +115,10 @@ export class UserService implements UserServiceInterface {
     return true
   }
   public async createUser(requestDto: CreateUserRequestDto): Promise<GetUserResponseDto> {
+    
     const user: User | null = await User.findOne({
       where: {
-        [Sequelize.Op.or]: [
+        [Op.or]: [
           { email: requestDto.email },
           { authId: requestDto.authId }
         ]
@@ -137,7 +139,7 @@ export class UserService implements UserServiceInterface {
       age : requestDto.age,
       address : requestDto.address
     });
-    return userCreated
+    return userCreated.dataValues;
   }
   public async partialUpdateUser(userId:UUID, updateUserDto: PatchUserRequestDto):Promise<GetUserResponseDto> {
     const user = await User.findByPk(userId);

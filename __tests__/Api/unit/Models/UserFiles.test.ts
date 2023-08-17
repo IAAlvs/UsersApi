@@ -1,4 +1,4 @@
-import { sequelize } from "../../../../src/database/database.config";
+import { sequelize } from "../../../../src/database/sequelize.config";
 import { User } from "../../../../src/api/models/user";
 import { UserFiles } from "../../../../src/api/models/user-file";
 
@@ -36,12 +36,12 @@ describe("UserFiles Model", () => {
       visible: true
     });
 
-    expect(userFile.userId).toBe("f8d2b728-c483-4868-aac1-6281f59b584b");
-    expect(userFile.fileId).toBe("f8d2b728-c483-4868-aac1-6281f59b583a");
-    expect(userFile.fileSize).toBe(500);
-    expect(userFile.fileType).toBe("pdf");
-    expect(userFile.dropDate).toBe("2000-08-10");
-    expect(userFile.visible).toBe(true);
+    expect(userFile.dataValues.userId).toBe("f8d2b728-c483-4868-aac1-6281f59b584b");
+    expect(userFile.dataValues.fileId).toBe("f8d2b728-c483-4868-aac1-6281f59b583a");
+    expect(userFile.dataValues.fileSize).toBe(500);
+    expect(userFile.dataValues.fileType).toBe("pdf");
+    expect(userFile.dataValues.dropDate).toBe("2000-08-10");
+    expect(userFile.dataValues.visible).toBe(true);
   });
 
   it("should update a user file", async () => {
@@ -53,10 +53,10 @@ describe("UserFiles Model", () => {
     })
 
     if (user) {
-      user.visible = false;
+      user.dataValues.visible = false;
       await user.save();
 
-      expect(user.visible).toBe(false);
+      expect(user.dataValues.visible).toBe(false);
     }
   });
 

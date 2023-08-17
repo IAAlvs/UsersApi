@@ -230,7 +230,7 @@ export class UsersController extends Controller implements UserControllerInterfa
         return errorResponse;
       }   
       this.setStatus(200);
-      return user;
+      return user as GetUserResponseDto;
       
     }
     catch (error) {
@@ -251,7 +251,7 @@ export class UsersController extends Controller implements UserControllerInterfa
     try {
       const users = await this._userService.getUsers();
       this.setStatus(200);
-      return users;
+      return users as GetUserResponseDto[];
     } catch (error) {
       const errorResponse: ErrorResponse = {
         message: 'Internal server error',
@@ -400,7 +400,7 @@ export class UsersController extends Controller implements UserControllerInterfa
       //const exists = await this._userService.getUser()
       const user = await this._userService.partialUpdateUser(userId, request)
       this.setStatus(200);
-      return user;
+      return user as GetUserResponseDto;
     }
     catch(error) {
       if(error instanceof ReferenceError)

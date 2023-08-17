@@ -67,6 +67,8 @@ Migrations are used to manage database schema changes over time. Sequelize provi
 
 To run the migrations and update your database schema, follow these steps:
 
+0. Make sure that you database exist either you could execute **npx sequelize-cli db:create**
+
 1. Make sure your database connection is properly configured in the **.env** file or the **config/config.js** file.
 
 2. Create a new migration file by running the following command:
