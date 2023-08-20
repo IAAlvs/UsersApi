@@ -44,8 +44,7 @@ export class UserService implements UserServiceInterface {
     }
     const userFiles : UserFiles[] | undefined = await UserFiles.findAll({ 
       where : {
-      userId : user.dataValues.id,
-      visible : true
+      userId : user.dataValues.id
     }});
     if(userFiles === undefined || userFiles === null){
       return ({
