@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  test:
+  test-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -32,17 +32,9 @@ jobs:
         run: |
           if [[ "${{ steps.tests.outcome }}" == 'success' ]]; then
             echo "All tests passed"
-            # Aquí podrías agregar una etiqueta o comentario a la confirmación si lo deseas
           else
             echo "Tests failed"
             exit 1
-
-  build-and-push:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
