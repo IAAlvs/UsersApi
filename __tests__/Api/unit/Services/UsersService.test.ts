@@ -407,7 +407,7 @@ describe('User Service Tests', () => {
     if(!totalUserFiles)
       throw new Error("Null response");
 
-    expect(totalUserFiles.files).toHaveLength(0);
+    expect(totalUserFiles.files[0].visible).toBeFalsy();
   });
   test("WithInexistenceUser_DeleteUserFile_Error", async () =>{
     const userId = "61ad624c-7233-4839-8ece-49fe0e3041ca";
