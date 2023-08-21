@@ -2,10 +2,12 @@
 node_modules
 npm-debug.log
 yarn-error.log
+npm-debug.log
 
 # Specific files
 Dockerfile
 .dockerignore
+
 
 #Others
 github
