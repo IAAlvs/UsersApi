@@ -1,8 +1,19 @@
 //This CAN NOT be change to ESM JS cause sequelize cli is not friendly for this
 const { config } = require('dotenv');
 config()
-// @ts-ignore
-const dbConfig = JSON.parse(process.env.DB_CONFIG);
+
+let dbConfig = {
+  username : "", 
+  password : "", 
+  database:"", 
+  host:"",
+  dialect:"",
+  port:""
+};
+if(process.env.NODE_ENV  !== "test"){
+  // @ts-ignore
+  dbConfig= JSON.parse(process.env.DB_CONFIG);
+}
 const environmentsConfig = {
   development: {
     "username": dbConfig.username,

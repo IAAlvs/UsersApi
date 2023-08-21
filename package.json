@@ -9,7 +9,7 @@
     "prestart": "npm run build",
     "start": "node dist/src/api/server.js",
     "pretest": "npm run swagger",
-    "test": "jest",
+    "test": "NODE_ENV=test jest",
     "swagger": "tsoa spec-and-routes"
   },
   "nodemonConfig": {

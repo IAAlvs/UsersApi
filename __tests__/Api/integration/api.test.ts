@@ -13,7 +13,6 @@ import { CreateUserResponseDto } from "@/api/controllers/userController";
 //change environment to test
 let token:string; 
 let configureEnv:Record<string, object>;
-process.env.TEST_ENV = "test";
 describe('Integration Tests', () => {
   beforeAll(async () =>{
     configureEnvv();
