@@ -3,7 +3,7 @@ const dbDir = require("./config/config");
 const dotenv = require('dotenv');
 dotenv.config()
 
-const env = (process.env.TEST_ENV)?"test":process.env.NODE_ENV || 'development';
+const env = process.env.NODE_ENV || 'development';
 // @ts-ignore
 const dbConfig = dbDir[env];
 const {username, password, database, host, dialect, port} = dbConfig;
