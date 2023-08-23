@@ -20,7 +20,7 @@ app.use(errorHandler)
 
 // Server running
 const server = app.listen(expressPort, () => {
-  console.log(`Server starting at : http://localhost:${expressPort}`);
+  console.log(`Server starting in port ${expressPort}`);
 });
 if(process.env.NODE_ENV == "test")
   server.close();
