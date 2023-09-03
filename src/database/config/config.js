@@ -23,14 +23,22 @@ const environmentsConfig = {
     "dialect": dbConfig.dialect,
     "port" : dbConfig.port,
     "dialectOptions": {
-      "createDatabaseIfNotExist": true
+      "createDatabaseIfNotExist": true,
+      "ssl": {
+        "require": true, // This will help you. But you will see nwe error
+        "rejectUnauthorized": false // This line will fix new error
+      } 
     }
   },
   test: {
     "dialect": "sqlite",
     "storage": ":memory:",
     "dialectOptions": {
-      "createDatabaseIfNotExist": true
+      "createDatabaseIfNotExist": true,
+      "ssl": {
+        "require": true, // This will help you. But you will see nwe error
+        "rejectUnauthorized": false // This line will fix new error
+      } 
     }
   },
   production: {
@@ -41,8 +49,12 @@ const environmentsConfig = {
     "dialect": dbConfig.dialect,
     "port" : dbConfig.port,
     "dialectOptions": {
-      "createDatabaseIfNotExist": true
+      "createDatabaseIfNotExist": true,
+      "ssl": {
+        "require": true, // This will help you. But you will see nwe error
+        "rejectUnauthorized": false // This line will fix new error
+      } 
     }
-  }
+  },
 }
 module.exports =  environmentsConfig;
