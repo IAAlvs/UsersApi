@@ -6,6 +6,7 @@
     "predev": "npm run swagger",
     "dev": "nodemon tsoa spec",
     "build": "tsc -p tsconfig.json",
+    "postbuild" : "npm run swagger",
     "prestart": "npm run build",
     "start": "node dist/src/api/server.js",
     "pretest": "npm run swagger",
