@@ -15,7 +15,8 @@ RUN npm ci --omit=dev
 COPY . .
 
 # Install TypeScript globally
-RUN npm install -g typescript
+RUN npm install -g typescript@5.1
+
 
 # Compile TypeScript code
 RUN npm run build
