@@ -10,6 +10,12 @@ const {username, password, database, host, dialect, port} = dbConfig;
 const sequelize = new Sequelize(database, username, password, {
     host,
     dialect,
+    dialectOptions: {
+        ssl: {
+          require: true, // Avoid postgrest error
+          rejectUnauthorized: false // Solves other error
+        }
+    },
     port, // default port postgrest
     logging : false
 });
