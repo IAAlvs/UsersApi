@@ -66,3 +66,10 @@ export interface PatchUserRequestDto{
     age? : number|null,
     address? : string|null
 }
+export interface PatchUserFileRequestDto{
+    fileName? : string|null,
+    fileSize? : number|null,
+    fileType? : string|null,
+    dropDate? : string|null,
+    visible? : boolean|null
+}

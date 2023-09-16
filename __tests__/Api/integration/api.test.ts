@@ -7,6 +7,7 @@ import {getTestToken, configureEnvv} from "../utils/generateTestPayload";
 const authDependency =  require("../../../src/api/middlewares/Authorization/AuthorizationMiddleware");
 import { JsonWebTokenError } from "jsonwebtoken";
 import { CreateUserResponseDto } from "@/api/controllers/userController";
+import { PatchUserFileRequestDto } from "@/api/dtos/UserDtos";
 
 
 // Mock the 'database.js' module that imports Sequelize
@@ -53,6 +54,17 @@ describe('Integration Tests', () => {
       createdAt : new Date(),
       updatedAt : new Date()
     }
+    const fileToPatch = {
+      userId : '61ad624c-7233-4839-8ece-49fe0e3041ce',
+      fileId : '82ad624c-7233-4839-8ece-49fe0e3041ce',
+      fileName : "fileName",
+      fileSize : 10101,
+      fileType : "pdf",
+      dropDate : "2023-07-06",
+      visible : true, 
+      createdAt : new Date(),
+      updatedAt : new Date()
+    }
     const userFileToDelete = {
       userId : '61ad624c-7233-4839-8ece-49fe0e3041ce',
       fileId : '62ad624c-7233-4839-9ece-49fe0e3041ce',
@@ -67,6 +79,7 @@ describe('Integration Tests', () => {
     await User.create(userToAdd);
     await User.create(userToPatch);
     await UserFiles.create(fileToAdd);
+    await UserFiles.create(fileToPatch)
     await UserFiles.create(userFileToDelete);
 
   },5000)
@@ -354,7 +367,7 @@ describe('Integration Tests', () => {
     }
   ];
   /*
-  Example wrong value
+  Example wrong value response
       {
       message: 'Validation Failed',
       details: {
@@ -363,7 +376,6 @@ describe('Integration Tests', () => {
           value: '2030-14-22'
         }
       }
-     
   */
   /* Invalid properties */
   let indexProperty =0;
@@ -605,8 +617,8 @@ describe('Integration Tests', () => {
     expect(response.status).toBe(409);
 
   });
-  /*  POST USER dto :: some values can be null but no other types different to predestinated:: */
-  /* SOME VALUES ARE REQUIRED AND CAN NOT BE TESTED AS NULL, MIDDLEWARE DETELETES NULL VALUES */
+  /*  POST USER dto :: Some values can be null but no other types different to predestinated:: */
+  /* SOME VALUES ARE REQUIRED AND CAN NOT BE TESTED AS NULL, MIDDLEWARE DELETES NULL VALUES */
   const dtoCreateUser = [
     //wrong email
     {
@@ -832,7 +844,7 @@ describe('Integration Tests', () => {
     expect(body.age).toStrictEqual(userToPatch.age);
     expect(body.address).toStrictEqual(userToPatch.address);
 });
-  const patchSinglePropertyDtos = [
+  const patchUserSinglePropertyDtos = [
     {
       emailVerified: true
     },
@@ -855,7 +867,7 @@ describe('Integration Tests', () => {
       address : "random adress"
     }
   ]
-  test.each(patchSinglePropertyDtos)(`Patch single property`, async dto => {
+  test.each(patchUserSinglePropertyDtos)(`Patch single property`, async dto => {  
     const scopes = ["create:profiles"]
     const token = JSON.stringify(getTestToken(scopes)); 
     const userId = '31ad624c-7233-4839-8ece-49fe0e3041ce'
@@ -1010,6 +1022,161 @@ describe('Integration Tests', () => {
     expect(authDependency.expressAuthentication).toHaveBeenCalledTimes(1);
     expect(response.status).toBe(422);
   });
+  //ENDPOINT PATCH USERFILE
+  test('WithOutToken_PatchUserFile_UnAuthorized', async () => {
+    const userId = "61ad624c-7233-4839-8ece-49fe0e3041ce";
+    const fileId = "82ad624c-7233-4839-8ece-49fe0e3041ce";
+    const updateUserFileDto : PatchUserFileRequestDto = {
+      "fileName": "updatedfilename",
+      "fileSize": 2000,
+      "fileType": "txt",
+      "dropDate": "2025-08-30",
+      "visible": true
+    }
 
+    const response = await request(app).patch(`/api/v1/users/${userId}/files/${fileId}`).send(updateUserFileDto);
+
+    expect(authDependency.expressAuthentication).toHaveBeenCalledTimes(1);
+    expect(response.status).toBe(401);
+  });
+  test('WithTokenButNotPermissions_PatchUserFile_UnAuthorized', async () => {
+    const scopes = ["fake:scope"]
+    const token = JSON.stringify(getTestToken(scopes)); 
+    const userId = "61ad624c-7233-4839-8ece-49fe0e3041ce";
+    const fileId = "82ad624c-7233-4839-8ece-49fe0e3041ce";
+    const updateUserFileDto : PatchUserFileRequestDto = {
+      "fileName": "updatedfilename",
+      "fileSize": 2000,
+      "fileType": "txt",
+      "dropDate": "2025-08-30",
+      "visible": true
+    }
+
+    const response = await request(app).patch(`/api/v1/users/${userId}/files/${fileId}`).send(updateUserFileDto).
+    set('Authorization', `Bearer ${token}`);
+
+    expect(authDependency.expressAuthentication).toHaveBeenCalledTimes(1);
+    expect(response.status).toBe(401);
+  });
+  test('WithAuthButNotExistenceUser_PatchUserFile_NotFound', async () => {
+    const scopes = ["upload:user-files"]
+    const token = JSON.stringify(getTestToken(scopes)); 
+    const userId = "51ad624c-7233-4839-8ece-49fe0e3041ce";
+    const fileId = "82ad624c-7233-4839-8ece-49fe0e3041ce";
+    const updateUserFileDto : PatchUserFileRequestDto = {
+      "fileName": "updatedfilename",
+      "fileSize": 2000,
+      "fileType": "txt",
+      "dropDate": "2025-08-30",
+      "visible": true
+    }
+
+    const response = await request(app).patch(`/api/v1/users/${userId}/files/${fileId}`).send(updateUserFileDto).
+    set('Authorization', `Bearer ${token}`);
+
+    expect(authDependency.expressAuthentication).toHaveBeenCalledTimes(1);
+    expect(response.status).toBe(404);
+  });
+  test('WithAuthAndUserId_PatchUserFile_PatchedFullyAllowedProperties', async () => {
+    const scopes = ["upload:user-files"]
+    const token = JSON.stringify(getTestToken(scopes)); 
+    const userId = "61ad624c-7233-4839-8ece-49fe0e3041ce";
+    const fileId = "82ad624c-7233-4839-8ece-49fe0e3041ce";
+    const updateUserFileDto : PatchUserFileRequestDto = {
+      "fileName": "updatedfilename",
+      "fileSize": 2000,
+      "fileType": "txt",
+      "dropDate": "2025-08-30",
+      "visible": true
+    }
+
+    const response = await request(app).patch(`/api/v1/users/${userId}/files/${fileId}`).send(updateUserFileDto).
+    set('Authorization', `Bearer ${token}`);
+
+    const body = response["body"];
+
+    expect(authDependency.expressAuthentication).toHaveBeenCalledTimes(1);
+    expect(response.status).toBe(200);
+    expect(body.id).toBeTruthy();
+    expect(body.fileName).toStrictEqual(updateUserFileDto.fileName);
+    expect(body.fileSize).toStrictEqual(updateUserFileDto.fileSize);
+    expect(body.dropDate).toStrictEqual(updateUserFileDto.dropDate);
+    expect(body.visible).toStrictEqual(updateUserFileDto.visible);
+    expect(body.createdAt).toBeTruthy();
+    expect(body.updatedAt).toBeTruthy;
+
+  });
+  const patchUserFileSinglePropertyDtos = [
+    {
+      fileName: "filechanged"
+    },
+    {
+      fileSize : 55555
+    },
+    {
+      fileType: "docx",
+    },
+    {
+      dropDate : "2025-09-23"
+    },
+    {
+      visible : true
+    }
+  ]
+  test.each(patchUserFileSinglePropertyDtos)(`Patch single property`, async dto => {  
+    const scopes = ["upload:user-files"]
+    const token = JSON.stringify(getTestToken(scopes)); 
+    const userId = "61ad624c-7233-4839-8ece-49fe0e3041ce";
+    const fileId = "82ad624c-7233-4839-8ece-49fe0e3041ce";
+
+    const [expectedKey, expectedValue] = Object.entries(dto)[0];
+
+    const response = await request(app).patch(`/api/v1/users/${userId}/files/${fileId}`).send(dto).
+    set('Authorization', `Bearer ${token}`);
+    
+    const body = response["body"];
+
+    expect(authDependency.expressAuthentication).toHaveBeenCalledTimes(1);
+    expect(response.status).toBe(200);
+    expect(body.id).toBeTruthy();
+    expect(body[expectedKey]as any).toStrictEqual(expectedValue);
+    expect(body.createdAt).toBeTruthy();
+    expect(body.updatedAt).toBeTruthy;
+  });
+  const patchWronUserFileSinglePropertyDtos = [
+    {
+      fileName: 12314123
+    },
+    {
+      fileSize : "hello world"
+    },
+    {
+      fileType: 321312312,
+    },
+    {
+      dropDate : 20250923
+    },
+    {
+      visible : "no"
+    }
+  ]
+  test.each(patchWronUserFileSinglePropertyDtos)(`Patch userfile if verifying values`, async dto => {
+    const scopes = ["upload:user-files"];
+    const token = JSON.stringify(getTestToken(scopes)); 
+    const userId = "61ad624c-7233-4839-8ece-49fe0e3041ce";
+    const fileId = "82ad624c-7233-4839-8ece-49fe0e3041ce";
+    const [expectedKey, expectedWrongValue] = Object.entries(dto)[0];
+
+    const response = await request(app).patch(`/api/v1/users/${userId}/files/${fileId}`).send(dto).
+    set('Authorization', `Bearer ${token}`);
+    const bodyResponse = response["body"];
+
+    expect(Object.keys(bodyResponse["details"]).length).toEqual(1);
+    expect(bodyResponse["details"][`request.${expectedKey}`]["message"]).toBeTruthy();
+    expect(bodyResponse["details"][`request.${expectedKey}`]["message"]).toBeTruthy();
+    expect(bodyResponse["details"][`request.${expectedKey}`]["value"]).toBe(expectedWrongValue)
+    expect(authDependency.expressAuthentication).toHaveBeenCalledTimes(1);
+    expect(response.status).toBe(422);
+  });
 
 });

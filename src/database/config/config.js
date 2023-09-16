@@ -8,7 +8,8 @@ let dbConfig = {
   database:"", 
   host:"",
   dialect:"",
-  port:""
+  port:"",
+  ssl:false
 };
 if(process.env.NODE_ENV  !== "test"){
   // @ts-ignore
@@ -24,21 +25,17 @@ const environmentsConfig = {
     "port" : dbConfig.port,
     "dialectOptions": {
       "createDatabaseIfNotExist": true,
-      "ssl": {
+      "ssl": dbConfig.ssl?{
         "require": true,
         "rejectUnauthorized": false 
-      } 
+      } :null
     }
   },
   test: {
     "dialect": "sqlite",
     "storage": ":memory:",
     "dialectOptions": {
-      "createDatabaseIfNotExist": true,
-      "ssl": {
-        "require": true,
-        "rejectUnauthorized": false
-      } 
+      "createDatabaseIfNotExist": true
     }
   },
   production: {
@@ -50,10 +47,10 @@ const environmentsConfig = {
     "port" : dbConfig.port,
     "dialectOptions": {
       "createDatabaseIfNotExist": true,
-      "ssl": {
+      "ssl": dbConfig.ssl?{
         "require": true,
-        "rejectUnauthorized": false
-      } 
+        "rejectUnauthorized": false 
+      } :null
     }
   },
 }

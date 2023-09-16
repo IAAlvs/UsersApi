@@ -137,6 +137,18 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "PatchUserFileRequestDto": {
+        "dataType": "refObject",
+        "properties": {
+            "fileName": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"validators":{"isString":{"errorMsg":"parameter fileName  must be string"},"minLength":{"errorMsg":"Can not be empty","value":1},"maxLength":{"errorMsg":"Max num of characters is 10","value":200}}},
+            "fileSize": {"dataType":"union","subSchemas":[{"dataType":"integer"},{"dataType":"enum","enums":[null]}],"validators":{"isInt":{"errorMsg":"parameter fileType is string"},"minimum":{"errorMsg":"fileSize can be less than 1","value":1},"maximum":{"errorMsg":"max value is 9999999999","value":99999999}}},
+            "fileType": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"validators":{"isString":{"errorMsg":"parameter fileType is string"},"minLength":{"errorMsg":"Can not be empty","value":1},"maxLength":{"errorMsg":"Max num of characters is 10","value":10}}},
+            "dropDate": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"validators":{"isString":{"errorMsg":"parameter dropdate is string"},"pattern":{"errorMsg":"Field does not match date YYYY-MM-DD pattern","value":"^(2[012][0-9][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"}}},
+            "visible": {"dataType":"union","subSchemas":[{"dataType":"boolean"},{"dataType":"enum","enums":[null]}]},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 };
 const validationService = new ValidationService(models);
 
@@ -360,6 +372,39 @@ export function RegisterRoutes(app: Router) {
 
 
               const promise = controller.partialUpdateUser.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.patch('/api/v1/users/:userId/files/:fileId',
+            authenticateMiddleware([{"auth0":["upload:user-files"]}]),
+            ...(fetchMiddlewares<RequestHandler>(UsersController)),
+            ...(fetchMiddlewares<RequestHandler>(UsersController.prototype.partialUpdateUserFile)),
+
+            async function UsersController_partialUpdateUserFile(request: any, response: any, next: any) {
+            const args = {
+                    userId: {"in":"path","name":"userId","required":true,"ref":"UUID"},
+                    fileId: {"in":"path","name":"fileId","required":true,"ref":"UUID"},
+                    request: {"in":"body","name":"request","required":true,"ref":"PatchUserFileRequestDto"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<UsersController>(UsersController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
+
+
+              const promise = controller.partialUpdateUserFile.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);

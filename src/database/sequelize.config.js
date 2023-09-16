@@ -6,16 +6,11 @@ dotenv.config()
 const env = process.env.NODE_ENV || 'development';
 // @ts-ignore
 const dbConfig = dbDir[env];
-const {username, password, database, host, dialect, port} = dbConfig;
+const {username, password, database, host, dialect, port, dialectOptions} = dbConfig;
 const sequelize = new Sequelize(database, username, password, {
     host,
     dialect,
-    dialectOptions: {
-        ssl: {
-          require: true, // Avoid postgrest error
-          rejectUnauthorized: false // Solves other error
-        }
-    },
+    dialectOptions,
     port, // default port postgrest
     logging : false
 });
