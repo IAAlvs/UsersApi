@@ -27,7 +27,7 @@ UserFiles.init(
       allowNull : false
     },
     fileSize: {
-      type: DataTypes.INTEGER,
+      type:DataTypes.BIGINT,
       autoIncrement : false, 
       field : "FileSize",
       allowNull : false

@@ -25,14 +25,14 @@ jobs:
     - run: npm ci
     - run: npm test
     
-  push:
+  push-image-to-registry:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
     needs: build-and-test
     strategy:
       matrix:
         node-version: [18.x] # Version what its going to be done before push
-    
+    if: github.event_name == 'push'
     steps:
     - name: Check out code
       uses: actions/checkout@v2

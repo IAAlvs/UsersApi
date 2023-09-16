@@ -83,9 +83,9 @@ export interface PostUserFileRequestDto{
   */
   fileName : string,
   /** 
-  *@isInt parameter fileType is string
+  *@isInt parameter fileSize is string
   *@minimum 1 fileSize can be less than 1
-  *@maximum 2172747904 max value is 2172747904
+  *@maximum 2147483648 max value is 2147483648
   */
   fileSize : number,
   /** 
@@ -204,9 +204,9 @@ export interface PatchUserFileRequestDto{
   */
   fileName? : string|null,
   /** 
-  *@isInt parameter fileType is string
+  *@isInt parameter fileSize is string
   *@minimum 1 fileSize can be less than 1
-  *@maximum 2172747904 max value is 2172747904
+  *@maximum 2147483648 max value is 2147483648
   */
   fileSize? : number|null,
   /** 
@@ -264,6 +264,7 @@ export class UsersController extends Controller implements UserControllerInterfa
         message: 'Internal server error',
         statusCode: 500
       };
+      console.error(error);
       this.setStatus(500);
       return errorResponse;
     }
@@ -283,7 +284,7 @@ export class UsersController extends Controller implements UserControllerInterfa
         message: 'Internal server error',
         statusCode: 500
       };
-      //res.status(500).json(errorResponse);
+      console.error(error);
       this.setStatus(500);
       return errorResponse;
     }
@@ -314,6 +315,7 @@ export class UsersController extends Controller implements UserControllerInterfa
         message: 'Internal server error',
         statusCode: 500
       };
+      console.error(error);
       this.setStatus(500);
       return errorResponse;
     }
@@ -345,6 +347,7 @@ export class UsersController extends Controller implements UserControllerInterfa
         message: 'Internal server error',
         statusCode: 500
       };
+      console.error(error);
       this.setStatus(500);
       return errorResponse;
     }
@@ -370,8 +373,8 @@ export class UsersController extends Controller implements UserControllerInterfa
         };
         this.setStatus(404);
         return errorResponse;
-
       }
+      console.error(error);
       const errorResponse: ErrorResponse = {
         message: 'Internal server error',
         statusCode: 500
@@ -406,6 +409,7 @@ export class UsersController extends Controller implements UserControllerInterfa
         this.setStatus(409);
         return errorResponse;
       }
+      console.error(error);
       const errorResponse: ErrorResponse = {
         message: 'Internal server error',
         statusCode: 500
@@ -438,7 +442,7 @@ export class UsersController extends Controller implements UserControllerInterfa
         this.setStatus(404);
         return conflictResponse;
       }
-      console.log(error);
+      console.error(error);
       const errorResponse: ErrorResponse = {
         message: 'Internal server error',
         statusCode: 500
@@ -469,6 +473,7 @@ export class UsersController extends Controller implements UserControllerInterfa
         this.setStatus(404);
         return conflictResponse;
       }
+      console.error(error);
       const errorResponse: ErrorResponse = {
         message: 'Internal server error',
         statusCode: 500
