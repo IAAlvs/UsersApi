@@ -2,9 +2,17 @@ import { injectable } from 'inversify';
 import { UserServiceInterface } from '../../interfaces/UserServiceInterface';
 import {User} from  "../../models/user";
 import { UserFiles } from '../../models/user-file';
-import { CreateUserRequestDto, GetUserFilesDtoResponse, GetUserResponseDto, PatchUserRequestDto, PostUserFileRequestDto, PostUserFileResponseDto} from "../../dtos/UserDtos";
+import { 
+  CreateUserRequestDto,
+  GetUserFilesDtoResponse,
+  GetUserResponseDto, 
+  PatchUserRequestDto,
+  PatchUserFileRequestDto,
+  PostUserFileRequestDto, 
+  PostUserFileResponseDto,
+  FileDto} from "../../dtos/UserDtos";
 import crypto, { UUID } from "crypto";
-import { Sequelize, Op } from 'sequelize';
+import { Op } from 'sequelize';
 @injectable()
 export class UserService implements UserServiceInterface {
 
@@ -26,14 +34,14 @@ export class UserService implements UserServiceInterface {
       }
     const values = users
       const response: GetUserResponseDto[] = users.map(({dataValues}):
-       GetUserResponseDto => {
-        const {id, authId, email, emailVerified, picture, name, lastName,
-          secondLastName, age, address,CreatedAt, UpdatedAt} = dataValues;
-        return {
-          id, authId, email, emailVerified, picture, name, lastName, secondLastName, age, address,
-            createdAt: CreatedAt, updatedAt: UpdatedAt  
+        GetUserResponseDto => {
+          const {id, authId, email, emailVerified, picture, name, lastName,
+            secondLastName, age, address,CreatedAt, UpdatedAt} = dataValues;
+          return {
+            id, authId, email, emailVerified, picture, name, lastName, secondLastName, age, address,
+              createdAt: CreatedAt, updatedAt: UpdatedAt  
+          }
         }
-       }
       ); 
       return response;   
   }
@@ -159,6 +167,37 @@ export class UserService implements UserServiceInterface {
         createdAt: CreatedAt, updatedAt: UpdatedAt};
       return response;
   }
-  
+  public async partialUpdateUserFile(userId:string, fileId:string, updateUserFileDto: PatchUserFileRequestDto):Promise<FileDto> {
+    const user = await User.findByPk(userId);
+    if (!user) 
+      throw new ReferenceError("User not found");
+    const userFile = await UserFiles.findOne({
+      where : {
+        userId : userId,
+        fileId : fileId
+      }
+    });
+    if(!userFile)
+        throw new ReferenceError("File not found");
+    const updatedFields:any = {};
+    for (const key in updateUserFileDto as Record<string, any>) {
+      if ((updateUserFileDto as Record<string, any>)[key] !== null) {
+        updatedFields[key] = (updateUserFileDto as Record<string, any>)[key];
+      }
+    }
+    await userFile.update(updatedFields);
+    const {dataValues} = userFile;
+    
+    return{
+      id : dataValues.fileId,
+      fileName : dataValues.fileName,
+      fileSize : dataValues.fileSize,
+      fileType : dataValues.fileType,
+      dropDate : dataValues.dropDate,
+      visible : dataValues.visible,
+      createdAt : dataValues.createdAt,
+      updatedAt : dataValues.updatedAt
+    }
+  }
   
 }

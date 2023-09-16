@@ -5,8 +5,9 @@ import { UserFiles } from "../../../../src/api/models/user-file";
 import { UserServiceInterface } from "@/api/interfaces/UserServiceInterface";
 import { iocContainer } from "../../../../src/api/aspects/inversify.config";
 import TYPES from "../../../../src/api/interfaces/ServiceTypes";
-import { CreateUserRequestDto, GetUserFilesDtoResponse, GetUserResponseDto, PostUserFileRequestDto } from "../../../../src/api/dtos/UserDtos";
+import { CreateUserRequestDto, GetUserFilesDtoResponse, GetUserResponseDto, PatchUserFileRequestDto, PostUserFileRequestDto } from "../../../../src/api/dtos/UserDtos";
 import { PatchUserRequestDto } from "../../../../src/api/dtos/UserDtos"
+import crypto from "crypto";
 
 let _userService : UserServiceInterface;
 const datesAreEqualWithinRange = (date1: Date, date2 : Date) => {
@@ -427,5 +428,60 @@ describe('User Service Tests', () => {
 
     await expect(deleteUserCallback).rejects.toThrow(ReferenceError)
   });
+    //Partial update user file tests
+    test("WithValidObject_PartialUpdateUserFile_UserFileUpdate", async () =>{
+      const userId = "61ad624c-7233-4839-8ece-49fe0e3041ce";
+      const fileId = "62ad624c-7233-4839-8ece-49fe0e3041ce";
+      const updateUserFileDto : PatchUserFileRequestDto = {
+        "fileName": "updatedfilename",
+        "fileSize": 2000,
+        "fileType": "txt",
+        "dropDate": "2025-08-30",
+        "visible": true
+      }
+  
+      const response = await _userService.partialUpdateUserFile(userId,fileId, updateUserFileDto);
+  
+      expect(response.id).toBeTruthy();
+      expect(response.fileName).toEqual(updateUserFileDto.fileName)
+      expect(response.fileType).toEqual(updateUserFileDto.fileType)
+      expect(response.fileSize).toEqual(updateUserFileDto.fileSize);
+      expect(response.dropDate).toEqual(updateUserFileDto.dropDate);
+      expect(response.visible).toEqual(updateUserFileDto.visible);
+      expect(response.createdAt).toBeTruthy();
+      expect(datesAreEqualWithinRange(response.updatedAt, new Date()))
+
+    });
+    test("WithOutUserInexistence_UpdateUserFile_ReferenceError", async () =>{
+      const userId = crypto.randomUUID();
+      const fileId = crypto.randomUUID();
+      const updateUserFileDto : PatchUserFileRequestDto = {
+        "fileName": "updatedfilename",
+        "fileSize": 2000,
+        "fileType": "txt",
+        "dropDate": "2025-08-30",
+        "visible": true
+      }
+  
+      const updateUserFileCallback = async () => await _userService.partialUpdateUserFile(userId, fileId, updateUserFileDto);
+  
+      await expect(updateUserFileCallback).rejects.toThrow(ReferenceError)
+    });
+    test("WithOutFileInexistence_UpdateUserFile_ReferenceError", async () =>{
+      const userId = "61ad624c-7233-4839-8ece-49fe0e3041ce";
+      const fileId = crypto.randomUUID();
+      const updateUserFileDto : PatchUserFileRequestDto = {
+        "fileName": "updatedfilename",
+        "fileSize": 2000,
+        "fileType": "txt",
+        "dropDate": "2025-08-30",
+        "visible": true
+      }
+  
+      const updateUserFileCallback = async () => await _userService.partialUpdateUserFile(userId, fileId, updateUserFileDto);
+  
+      await expect(updateUserFileCallback).rejects.toThrow(ReferenceError)
+    });
+
 
 });

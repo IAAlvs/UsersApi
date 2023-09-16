@@ -82,7 +82,7 @@ export interface PostUserFileRequestDto{
   *@maxLength 200 Max num of characters is 10
   */
   fileName : string,
-    /** 
+  /** 
   *@isInt parameter fileType is string
   *@minimum 1 fileSize can be less than 1
   *@maximum 99999999 max value is 9999999999
@@ -94,9 +94,9 @@ export interface PostUserFileRequestDto{
   *@maxLength 10 Max num of characters is 10
   */
   fileType : string,
-    /** 
+  /** 
   *@isString parameter dropdate is string
-   @pattern ^(2[012][0-9][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$ Field does not match date YYYY-MM-DD pattern
+  *@pattern ^(2[012][0-9][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$ Field does not match date YYYY-MM-DD pattern
   */
   dropDate : string,
   visible? : boolean
@@ -195,6 +195,32 @@ export interface PatchUserRequestDto{
   *@maxLength 100 Max num of characters is 100
   */
   address? : string|null//optional in db 
+}
+export interface PatchUserFileRequestDto{
+  /** 
+  *@isString parameter fileName  must be string
+  *@minLength 1 Can not be empty
+  *@maxLength 200 Max num of characters is 10
+  */
+  fileName? : string|null,
+  /** 
+  *@isInt parameter fileType is string
+  *@minimum 1 fileSize can be less than 1
+  *@maximum 99999999 max value is 9999999999
+  */
+  fileSize? : number|null,
+  /** 
+  *@isString parameter fileType is string
+  *@minLength 1 Can not be empty
+  *@maxLength 10 Max num of characters is 10
+  */
+  fileType? : string|null,
+  /** 
+  *@isString parameter dropdate is string
+  *@pattern ^(2[012][0-9][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$ Field does not match date YYYY-MM-DD pattern
+  */
+  dropDate? : string|null,
+  visible? : boolean|null
 }
 export interface CreateUserResponseDto{
   id : UUID,
@@ -413,6 +439,36 @@ export class UsersController extends Controller implements UserControllerInterfa
         return conflictResponse;
       }
       console.log(error);
+      const errorResponse: ErrorResponse = {
+        message: 'Internal server error',
+        statusCode: 500
+      };
+      this.setStatus(500);
+      return errorResponse;
+    }
+  }
+  @Patch("users/{userId}/files/{fileId}")
+  @Security("auth0",["upload:user-files"])
+  @Response(401, 'UnAuthorized')
+  @Response(409, 'Conflict')
+  @Response<ErrorResponse>(400, "Bad request")
+  @Response(500, "Server Error")
+  public async partialUpdateUserFile(@Path() userId : UUID, @Path() fileId : UUID,@Body() request: PatchUserFileRequestDto): Promise<FileDto | ErrorResponse> {
+    try {
+      const user = await this._userService.partialUpdateUserFile(userId, fileId, request)
+      this.setStatus(200);
+      return user as FileDto;
+    }
+    catch(error) {
+      if(error instanceof ReferenceError)
+      {
+        const conflictResponse: ErrorResponse = {
+          message: error.message || "Conflict",
+          statusCode: 404
+        };
+        this.setStatus(404);
+        return conflictResponse;
+      }
       const errorResponse: ErrorResponse = {
         message: 'Internal server error',
         statusCode: 500
