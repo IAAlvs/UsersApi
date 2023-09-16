@@ -85,7 +85,7 @@ export interface PostUserFileRequestDto{
   /** 
   *@isInt parameter fileType is string
   *@minimum 1 fileSize can be less than 1
-  *@maximum 99999999 max value is 9999999999
+  *@maximum 2172747904 max value is 2172747904
   */
   fileSize : number,
   /** 
@@ -206,7 +206,7 @@ export interface PatchUserFileRequestDto{
   /** 
   *@isInt parameter fileType is string
   *@minimum 1 fileSize can be less than 1
-  *@maximum 99999999 max value is 9999999999
+  *@maximum 2172747904 max value is 2172747904
   */
   fileSize? : number|null,
   /** 
