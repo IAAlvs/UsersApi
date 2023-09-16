@@ -89,7 +89,7 @@ const models: TsoaRoute.Models = {
         "properties": {
             "fileId": {"ref":"UUID","required":true},
             "fileName": {"dataType":"string","required":true,"validators":{"isString":{"errorMsg":"parameter fileName  must be string"},"minLength":{"errorMsg":"Can not be empty","value":1},"maxLength":{"errorMsg":"Max num of characters is 10","value":200}}},
-            "fileSize": {"dataType":"integer","required":true,"validators":{"isInt":{"errorMsg":"parameter fileType is string"},"minimum":{"errorMsg":"fileSize can be less than 1","value":1},"maximum":{"errorMsg":"max value is 2172747904","value":2172747904}}},
+            "fileSize": {"dataType":"integer","required":true,"validators":{"isInt":{"errorMsg":"parameter fileSize is string"},"minimum":{"errorMsg":"fileSize can be less than 1","value":1},"maximum":{"errorMsg":"max value is 2147483648","value":2147483648}}},
             "fileType": {"dataType":"string","required":true,"validators":{"isString":{"errorMsg":"parameter fileType is string"},"minLength":{"errorMsg":"Can not be empty","value":1},"maxLength":{"errorMsg":"Max num of characters is 10","value":10}}},
             "dropDate": {"dataType":"string","required":true,"validators":{"isString":{"errorMsg":"parameter dropdate is string"},"pattern":{"errorMsg":"Field does not match date YYYY-MM-DD pattern","value":"^(2[012][0-9][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"}}},
             "visible": {"dataType":"boolean"},
@@ -141,7 +141,7 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "fileName": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"validators":{"isString":{"errorMsg":"parameter fileName  must be string"},"minLength":{"errorMsg":"Can not be empty","value":1},"maxLength":{"errorMsg":"Max num of characters is 10","value":200}}},
-            "fileSize": {"dataType":"union","subSchemas":[{"dataType":"integer"},{"dataType":"enum","enums":[null]}],"validators":{"isInt":{"errorMsg":"parameter fileType is string"},"minimum":{"errorMsg":"fileSize can be less than 1","value":1},"maximum":{"errorMsg":"max value is 2172747904","value":2172747904}}},
+            "fileSize": {"dataType":"union","subSchemas":[{"dataType":"integer"},{"dataType":"enum","enums":[null]}],"validators":{"isInt":{"errorMsg":"parameter fileSize is string"},"minimum":{"errorMsg":"fileSize can be less than 1","value":1},"maximum":{"errorMsg":"max value is 2147483648","value":2147483648}}},
             "fileType": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"validators":{"isString":{"errorMsg":"parameter fileType is string"},"minLength":{"errorMsg":"Can not be empty","value":1},"maxLength":{"errorMsg":"Max num of characters is 10","value":10}}},
             "dropDate": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"validators":{"isString":{"errorMsg":"parameter dropdate is string"},"pattern":{"errorMsg":"Field does not match date YYYY-MM-DD pattern","value":"^(2[012][0-9][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"}}},
             "visible": {"dataType":"union","subSchemas":[{"dataType":"boolean"},{"dataType":"enum","enums":[null]}]},
