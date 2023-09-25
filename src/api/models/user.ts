@@ -17,7 +17,7 @@ User.init(
     },
     email : {
       type: DataTypes.STRING,
-      unique: true,
+      unique: false,
       field: "Email"
     },
     emailVerified : {

@@ -570,7 +570,8 @@ describe('Integration Tests', () => {
     expect(body.id).toBeTruthy();
 
   });
-  test('WithEmailInDb_CreateUser_Conflict', async () => {
+  /* Already changed a user can have multiple account with same email */
+  /* test('WithEmailInDb_CreateUser_Conflict', async () => {
     const scopes = ["create:profiles"]
     const token = JSON.stringify(getTestToken(scopes)); 
     //email alredy in db in beforeall section
@@ -593,7 +594,7 @@ describe('Integration Tests', () => {
     expect(authDependency.expressAuthentication).toHaveBeenCalledTimes(1);
     expect(response.status).toBe(409);
 
-  });
+  }); */
   test('WithAuthId_CreateUser_Conflict', async () => {
     const scopes = ["create:profiles"]
     const token = JSON.stringify(getTestToken(scopes)); 
