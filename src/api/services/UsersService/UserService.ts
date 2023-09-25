@@ -126,7 +126,6 @@ export class UserService implements UserServiceInterface {
     const user: User | null = await User.findOne({
       where: {
         [Op.or]: [
-          { email: requestDto.email },
           { authId: requestDto.authId }
         ]
       }
