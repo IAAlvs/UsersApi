@@ -1,10 +1,13 @@
 import { Container, decorate, injectable } from "inversify";
 import { Controller } from "tsoa";
-import { UUID, UserControllerInterface, UsersController, PostUserFileRequestDto } from "../controllers/userController";
+import { UUID, UserControllerInterface, UsersController} from "../controllers/userController";
+import { PostUserFileRequestDto } from "../controllers/userFilesController";
 import { buildProviderModule } from "inversify-binding-decorators";
 import TYPES from "../interfaces/ServiceTypes";
 import { UserServiceInterface } from "../interfaces/UserServiceInterface";
 import { UserService } from "../services/UsersService/UserService";
+import { UsersSubscriptionController, UserSubscriptionControllerInterface } from "../controllers/userSubscriptionsController";
+import { UserFilesController, UserFilesControllerInterface } from "../controllers/userFilesController";
 
 export class ServicesAspects{
     public static Define(iocContainer: Container) : void{
@@ -15,6 +18,9 @@ export class ServicesAspects{
         decorate(injectable(), Controller);
         iocContainer.bind<UserServiceInterface>(TYPES.UserServiceInterface).to(UserService).inSingletonScope()
         iocContainer.bind<UserControllerInterface>(TYPES.UserControllerInterface).to(UsersController).inSingletonScope();
+        iocContainer.bind<UserSubscriptionControllerInterface>(TYPES.UserSubscriptionsController).to(UsersSubscriptionController)
+        iocContainer.bind<UserFilesControllerInterface>(TYPES.UserFilesController).to(UserFilesController)
+
         iocContainer.load(buildProviderModule());
 
     }

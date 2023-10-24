@@ -73,3 +73,22 @@ export interface PatchUserFileRequestDto{
     dropDate? : string|null,
     visible? : boolean|null
 }
+export interface CreateUserSubscription{
+    userId : string,
+    customerId : string, 
+    renewDate : string
+    description? : string
+}
+export interface PostUserSubscriptionResponseDto{
+    id : string,
+    userId : string,
+    customerId : string,
+    renewDate : string,
+    description? : string,
+    createdAt : Date,
+    updatedAt : Date
+}
+export interface PatchUserSubscriptionRequestDto{
+    renewDate? : string,
+    description? : string
+}

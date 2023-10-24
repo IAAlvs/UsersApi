@@ -13,24 +13,19 @@ import {
   Security,
   Body,
   Post,
-  Header,
-  Request,
   Patch,
-  Delete} from "tsoa";
+  Tags} from "tsoa";
 export interface UserControllerInterface{
+    createUser(userDto : CreateUserRequestDto) : Promise<CreateUserResponseDto | ErrorResponse>,
     getUser(userId: UUID, validator?: any): Promise<GetUserResponseDto | ErrorResponse>,
     getUsers(): Promise<GetUserResponseDto[] | ErrorResponse>,
-    getUserFiles(userId: UUID): Promise<GetUserFilesDtoResponse | ErrorResponse>,
-    uploadUserFile(userId: UUID,request : PostUserFileRequestDto): Promise<PostUserFileResponseDto | ErrorResponse>,
-    deleteUserFile(userId : UUID, fileId: UUID): Promise<void| ErrorResponse>,
-    createUser(userDto : CreateUserRequestDto) : Promise<CreateUserResponseDto | ErrorResponse>,
     partialUpdateUser(userId : UUID, request : PatchUserRequestDto): Promise<GetUserResponseDto | ErrorResponse>
 
-}
+  }
 
 /** 
  *@isString Provide valid string
- @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$ Field does not match UUID pattern
+  @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$ Field does not match UUID pattern
 */
 export type UUID = string;
   /** 
@@ -52,64 +47,9 @@ export interface GetUserResponseDto{
     createdAt : Date, 
     updatedAt : Date
 }
-export interface FileDto{
-  id : UUID,
-  fileName : string,
-  fileSize : number,
-  fileType : string
-  dropDate : string
-  visible : boolean
-  createdAt : Date
-  updatedAt : Date
-}
-export interface GetUserFilesDtoResponse{
-  userId : UUID,
-  files : Array<FileDto>
-} 
 export interface ErrorResponse {
 message: string;
 statusCode: number;
-}
-export interface UploadUserFile{
-  userId : UUID,
-  fileId : UUID
-}
-export interface PostUserFileRequestDto{
-  fileId : UUID,
-  /** 
-  *@isString parameter fileName  must be string
-  *@minLength 1 Can not be empty
-  *@maxLength 200 Max num of characters is 10
-  */
-  fileName : string,
-  /** 
-  *@isInt parameter fileSize is string
-  *@minimum 1 fileSize can be less than 1
-  *@maximum 2147483648 max value is 2147483648
-  */
-  fileSize : number,
-  /** 
-  *@isString parameter fileType is string
-  *@minLength 1 Can not be empty
-  *@maxLength 10 Max num of characters is 10
-  */
-  fileType : string,
-  /** 
-  *@isString parameter dropdate is string
-  *@pattern ^(2[012][0-9][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$ Field does not match date YYYY-MM-DD pattern
-  */
-  dropDate : string,
-  visible? : boolean
-}
-export interface PostUserFileResponseDto{
-  userId : UUID, 
-  fileId : UUID,
-  fileSize : number,
-  fileType : string,
-  dropDate : string,
-  visible : boolean,
-  createdAt : Date,
-  updatedAt : Date
 }
 export interface CreateUserRequestDto{
   /**
@@ -196,38 +136,43 @@ export interface PatchUserRequestDto{
   */
   address? : string|null//optional in db 
 }
-export interface PatchUserFileRequestDto{
-  /** 
-  *@isString parameter fileName  must be string
-  *@minLength 1 Can not be empty
-  *@maxLength 200 Max num of characters is 10
-  */
-  fileName? : string|null,
-  /** 
-  *@isInt parameter fileSize is string
-  *@minimum 1 fileSize can be less than 1
-  *@maximum 2147483648 max value is 2147483648
-  */
-  fileSize? : number|null,
-  /** 
-  *@isString parameter fileType is string
-  *@minLength 1 Can not be empty
-  *@maxLength 10 Max num of characters is 10
-  */
-  fileType? : string|null,
-  /** 
-  *@isString parameter dropdate is string
-  *@pattern ^(2[012][0-9][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$ Field does not match date YYYY-MM-DD pattern
-  */
-  dropDate? : string|null,
-  visible? : boolean|null
-}
 export interface CreateUserResponseDto{
   id : UUID,
   email : string,
   status : string
 
 }
+export interface CreateUserSubscriptionRequestDto{
+  /** 
+  *@isString parameter customerId  must be string
+  *@minLength 1 customerId Can not be empty
+  *@maxLength 50 Max num of characters is 50
+  */
+  customerId : string,
+    /** 
+  *@isString parameter renewDate is string
+  *@pattern ^(2[012][0-9][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$ Field does not match date YYYY-MM-DD pattern
+  */ 
+  renewDate : string
+}
+export interface PostUserSubscriptionResponseDto{
+  id : string,
+  userId : string,
+  /** 
+  *@isString parameter customerId  must be string
+  *@minLength 1 customerId Can not be empty
+  *@maxLength 50 Max num of characters is 50
+  */
+  customerId : string,
+  /** 
+  *@isString parameter renewDate is string
+  *@pattern ^(2[012][0-9][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$ Field does not match date YYYY-MM-DD pattern
+  */ 
+  renewDate : string,
+  updatedAt : Date,
+  createdAt : Date
+}
+@Tags("Users profile")
 @Route("api/v1/")
 @provideSingleton(UsersController)
 @injectable()
@@ -237,7 +182,11 @@ export class UsersController extends Controller implements UserControllerInterfa
     @inject(TYPES.UserServiceInterface) private _userService: UserServiceInterface
     ) {
     super();
-  }
+    }
+  /**
+   * Retrieves the details of an existing user.
+   * Supply the unique user ID from either and receive corresponding user details.
+   */
   @Security("auth0",["read:users"])
   @Get("users/{userId}")
   @Response(401, 'UnAuthorized')
@@ -269,6 +218,10 @@ export class UsersController extends Controller implements UserControllerInterfa
       return errorResponse;
     }
   }
+  /**
+   * Retrieves All users
+   *
+   */
   @Security("auth0", ["global:users"])
   @Get("users")
   @SuccessResponse("200", "Ok")
@@ -285,100 +238,6 @@ export class UsersController extends Controller implements UserControllerInterfa
         statusCode: 500
       };
       console.error(error);
-      this.setStatus(500);
-      return errorResponse;
-    }
-  }
-  @Security("auth0",["read:users"])
-  @Get("users/{userId}/files")
-  @Response(401, 'UnAuthorized')
-  @Response<ErrorResponse>(400, "Bad request")
-  @Response<ErrorResponse>(404, "Not found")
-  @Response(500, "Server Error")
-  public async getUserFiles(@Path() userId: UUID): Promise<GetUserFilesDtoResponse | ErrorResponse>{
-    try {
-      const userFiles = await this._userService.getUserFiles(userId);
-      if (!userFiles){
-        const errorResponse: ErrorResponse = {
-          message: 'User not found',
-          statusCode: 404
-        };
-        this.setStatus(404);
-        return errorResponse;
-      }   
-      this.setStatus(200);
-      return userFiles;
-      
-    }
-    catch (error) {
-      const errorResponse: ErrorResponse = {
-        message: 'Internal server error',
-        statusCode: 500
-      };
-      console.error(error);
-      this.setStatus(500);
-      return errorResponse;
-    }
-  }
-  @Security("auth0",["upload:user-files"])
-  @Post("users/{userId}/files")
-  @Response(401, 'UnAuthorized')
-  @Response(409, 'Conflict')
-  @Response<ErrorResponse>(400, "Bad request")
-  @Response(500, "Server Error")
-  public async uploadUserFile(@Path() userId : UUID, @Body() request : PostUserFileRequestDto): Promise<PostUserFileResponseDto | ErrorResponse>{    
-    try {
-      const userFile = await this._userService.uploadUserFile(userId,request); 
-      this.setStatus(200);
-      //We  have multiple dtos one for service an other for service
-      return userFile;
-    }
-    catch (error) {
-      if(error instanceof ReferenceError)
-      {
-        const conflictResponse: ErrorResponse = {
-          message: error.message || "Conflict",
-          statusCode: 409
-        };
-        this.setStatus(409);
-        return conflictResponse;
-      }
-      const errorResponse: ErrorResponse = {
-        message: 'Internal server error',
-        statusCode: 500
-      };
-      console.error(error);
-      this.setStatus(500);
-      return errorResponse;
-    }
-  }
-  @Security("auth0",["upload:user-files"])
-  @Delete("users/:userId/files/:fileId")
-  @Response(401, 'UnAuthorized')
-  @Response(409, 'Conflict')
-  @Response<ErrorResponse>(400, "Bad request")
-  @Response(500, "Server Error")
-  public async deleteUserFile(@Path() userId :UUID,@Path()fileId: UUID): Promise<void | ErrorResponse> {
-    try {
-      await this._userService.deleteUserFile(userId, fileId)
-      this.setStatus(200);
-      //We  have multiple dtos one for service an other for service
-      return;
-    }
-    catch (error) {
-      if(error instanceof ReferenceError){
-        const errorResponse: ErrorResponse = {
-          message: error.message,
-          statusCode: 404
-        };
-        this.setStatus(404);
-        return errorResponse;
-      }
-      console.error(error);
-      const errorResponse: ErrorResponse = {
-        message: 'Internal server error',
-        statusCode: 500
-      };
       this.setStatus(500);
       return errorResponse;
     }
@@ -431,37 +290,6 @@ export class UsersController extends Controller implements UserControllerInterfa
       const user = await this._userService.partialUpdateUser(userId, request)
       this.setStatus(200);
       return user as GetUserResponseDto;
-    }
-    catch(error) {
-      if(error instanceof ReferenceError)
-      {
-        const conflictResponse: ErrorResponse = {
-          message: error.message || "Conflict",
-          statusCode: 404
-        };
-        this.setStatus(404);
-        return conflictResponse;
-      }
-      console.error(error);
-      const errorResponse: ErrorResponse = {
-        message: 'Internal server error',
-        statusCode: 500
-      };
-      this.setStatus(500);
-      return errorResponse;
-    }
-  }
-  @Patch("users/{userId}/files/{fileId}")
-  @Security("auth0",["upload:user-files"])
-  @Response(401, 'UnAuthorized')
-  @Response(409, 'Conflict')
-  @Response<ErrorResponse>(400, "Bad request")
-  @Response(500, "Server Error")
-  public async partialUpdateUserFile(@Path() userId : UUID, @Path() fileId : UUID,@Body() request: PatchUserFileRequestDto): Promise<FileDto | ErrorResponse> {
-    try {
-      const user = await this._userService.partialUpdateUserFile(userId, fileId, request)
-      this.setStatus(200);
-      return user as FileDto;
     }
     catch(error) {
       if(error instanceof ReferenceError)

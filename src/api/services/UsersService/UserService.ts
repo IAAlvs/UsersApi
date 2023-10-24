@@ -10,14 +10,18 @@ import {
   PatchUserFileRequestDto,
   PostUserFileRequestDto, 
   PostUserFileResponseDto,
-  FileDto} from "../../dtos/UserDtos";
+  FileDto,
+  CreateUserSubscription,
+  PostUserSubscriptionResponseDto,
+  PatchUserSubscriptionRequestDto} from "../../dtos/UserDtos";
 import crypto, { UUID } from "crypto";
 import { Op } from 'sequelize';
+import { UserSubscriptions } from "../../models/users-subscription";
+
 @injectable()
 export class UserService implements UserServiceInterface {
 
   public async getUser(userId : string): Promise<GetUserResponseDto | null> {
-    
     const user: User | null = await User.findByPk(userId);
     if (!user) {
         return null;
@@ -199,4 +203,68 @@ export class UserService implements UserServiceInterface {
     }
   }
   
+  public async createUserSubscription(subscriptionDto : CreateUserSubscription): Promise<PostUserSubscriptionResponseDto> {
+    const {userId, customerId, renewDate, description} = subscriptionDto;
+    const user: User | null = await User.findByPk(userId);
+    if (!user) {
+        throw new ReferenceError("User not found");
+    }
+    const subscriptionExist = await UserSubscriptions.findAndCountAll({
+      where : {
+        userId : userId,
+        customerId : customerId
+      }
+    })
+    if(subscriptionExist.count>0){
+      throw new ReferenceError(`Subscription with customer ${customerId} already exists`)
+    }
+    const userSubscription : UserFiles = await UserSubscriptions.create({
+      id : crypto.randomUUID(),
+      userId : userId ,
+      customerId : customerId,
+      renewDate : renewDate,
+      description : description
+    })
+    return userSubscription.dataValues;
+  }
+  public async getUserSubscriptions(userId: string): Promise<PostUserSubscriptionResponseDto[]> {
+    const user: User | null = await User.findByPk(userId);
+    if (!user) {
+        throw new ReferenceError("User not found");
+    }
+    const {count, rows} = await UserSubscriptions.findAndCountAll({
+        where :{
+          userId : userId
+        }
+      })
+      if (count === 0) {
+          return [];
+      }
+      let response : PostUserSubscriptionResponseDto[] = [];
+      rows.map((subscription:UserSubscriptions) =>
+      response.push(subscription as unknown as PostUserSubscriptionResponseDto))
+      return response;
+  }
+  
+  public async patchUserSubscription(userId: string, customerId: string, patchDto : PatchUserSubscriptionRequestDto): Promise<PostUserSubscriptionResponseDto> {
+    const subscription = await UserSubscriptions.findOne({
+      where : {
+        userId, 
+        customerId
+      }
+    });
+    if (!subscription) {
+      throw new ReferenceError("User subscription not found");
+    }
+    const patchUserDtoObj = patchDto as Record<string, any>;
+
+    const updatedFields:Record<string, any> = {};
+    for (const key in patchUserDtoObj) {
+      if (patchUserDtoObj[key] !== null) {
+        updatedFields[key] = patchUserDtoObj[key];
+      }
+    }
+    await subscription.update(updatedFields);
+    return subscription.dataValues;
+  }
 }

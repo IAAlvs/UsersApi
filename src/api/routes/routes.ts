@@ -3,7 +3,11 @@
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { Controller, ValidationService, FieldErrors, ValidateError, TsoaRoute, HttpStatusCodeLiteral, TsoaResponse, fetchMiddlewares } from '@tsoa/runtime';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { UserFilesController } from './../controllers/userFilesController';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { UsersController } from './../controllers/userController';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { UsersSubscriptionController } from './../controllers/userSubscriptionsController';
 import { expressAuthentication } from './../middlewares/Authorization/AuthorizationMiddleware';
 // @ts-ignore - no great way to install types from subpackage
 const promiseAny = require('promise.any');
@@ -17,32 +21,6 @@ const models: TsoaRoute.Models = {
     "UUID": {
         "dataType": "refAlias",
         "type": {"dataType":"string","validators":{"isString":{"errorMsg":"Provide valid string"},"pattern":{"errorMsg":"Field does not match UUID pattern","value":"^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"}}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "GetUserResponseDto": {
-        "dataType": "refObject",
-        "properties": {
-            "id": {"ref":"UUID","required":true},
-            "authId": {"dataType":"string","required":true},
-            "email": {"dataType":"string","required":true},
-            "name": {"dataType":"string"},
-            "lastName": {"dataType":"string"},
-            "secondLastName": {"dataType":"string"},
-            "age": {"dataType":"double"},
-            "address": {"dataType":"string"},
-            "createdAt": {"dataType":"datetime","required":true},
-            "updatedAt": {"dataType":"datetime","required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "ErrorResponse": {
-        "dataType": "refObject",
-        "properties": {
-            "message": {"dataType":"string","required":true},
-            "statusCode": {"dataType":"double","required":true},
-        },
-        "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "FileDto": {
@@ -65,6 +43,15 @@ const models: TsoaRoute.Models = {
         "properties": {
             "userId": {"ref":"UUID","required":true},
             "files": {"dataType":"array","array":{"dataType":"refObject","ref":"FileDto"},"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ErrorResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "message": {"dataType":"string","required":true},
+            "statusCode": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
     },
@@ -93,6 +80,35 @@ const models: TsoaRoute.Models = {
             "fileType": {"dataType":"string","required":true,"validators":{"isString":{"errorMsg":"parameter fileType is string"},"minLength":{"errorMsg":"Can not be empty","value":1},"maxLength":{"errorMsg":"Max num of characters is 10","value":10}}},
             "dropDate": {"dataType":"string","required":true,"validators":{"isString":{"errorMsg":"parameter dropdate is string"},"pattern":{"errorMsg":"Field does not match date YYYY-MM-DD pattern","value":"^(2[012][0-9][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"}}},
             "visible": {"dataType":"boolean"},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "PatchUserFileRequestDto": {
+        "dataType": "refObject",
+        "properties": {
+            "fileName": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"validators":{"isString":{"errorMsg":"parameter fileName  must be string"},"minLength":{"errorMsg":"Can not be empty","value":1},"maxLength":{"errorMsg":"Max num of characters is 10","value":200}}},
+            "fileSize": {"dataType":"union","subSchemas":[{"dataType":"integer"},{"dataType":"enum","enums":[null]}],"validators":{"isInt":{"errorMsg":"parameter fileSize is string"},"minimum":{"errorMsg":"fileSize can be less than 1","value":1},"maximum":{"errorMsg":"max value is 2147483648","value":2147483648}}},
+            "fileType": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"validators":{"isString":{"errorMsg":"parameter fileType is string"},"minLength":{"errorMsg":"Can not be empty","value":1},"maxLength":{"errorMsg":"Max num of characters is 10","value":10}}},
+            "dropDate": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"validators":{"isString":{"errorMsg":"parameter dropdate is string"},"pattern":{"errorMsg":"Field does not match date YYYY-MM-DD pattern","value":"^(2[012][0-9][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"}}},
+            "visible": {"dataType":"union","subSchemas":[{"dataType":"boolean"},{"dataType":"enum","enums":[null]}]},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GetUserResponseDto": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"ref":"UUID","required":true},
+            "authId": {"dataType":"string","required":true},
+            "email": {"dataType":"string","required":true},
+            "name": {"dataType":"string"},
+            "lastName": {"dataType":"string"},
+            "secondLastName": {"dataType":"string"},
+            "age": {"dataType":"double"},
+            "address": {"dataType":"string"},
+            "createdAt": {"dataType":"datetime","required":true},
+            "updatedAt": {"dataType":"datetime","required":true},
         },
         "additionalProperties": false,
     },
@@ -137,14 +153,33 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "PatchUserFileRequestDto": {
+    "PostUserSubscriptionResponseDto": {
         "dataType": "refObject",
         "properties": {
-            "fileName": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"validators":{"isString":{"errorMsg":"parameter fileName  must be string"},"minLength":{"errorMsg":"Can not be empty","value":1},"maxLength":{"errorMsg":"Max num of characters is 10","value":200}}},
-            "fileSize": {"dataType":"union","subSchemas":[{"dataType":"integer"},{"dataType":"enum","enums":[null]}],"validators":{"isInt":{"errorMsg":"parameter fileSize is string"},"minimum":{"errorMsg":"fileSize can be less than 1","value":1},"maximum":{"errorMsg":"max value is 2147483648","value":2147483648}}},
-            "fileType": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"validators":{"isString":{"errorMsg":"parameter fileType is string"},"minLength":{"errorMsg":"Can not be empty","value":1},"maxLength":{"errorMsg":"Max num of characters is 10","value":10}}},
-            "dropDate": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"validators":{"isString":{"errorMsg":"parameter dropdate is string"},"pattern":{"errorMsg":"Field does not match date YYYY-MM-DD pattern","value":"^(2[012][0-9][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"}}},
-            "visible": {"dataType":"union","subSchemas":[{"dataType":"boolean"},{"dataType":"enum","enums":[null]}]},
+            "id": {"dataType":"string","required":true},
+            "userId": {"dataType":"string","required":true},
+            "customerId": {"dataType":"string","required":true,"validators":{"isString":{"errorMsg":"parameter customerId  must be string"},"minLength":{"errorMsg":"customerId Can not be empty","value":1},"maxLength":{"errorMsg":"Max num of characters is 50","value":50}}},
+            "renewDate": {"dataType":"string","required":true,"validators":{"isString":{"errorMsg":"parameter renewDate is string"},"pattern":{"errorMsg":"Field does not match date YYYY-MM-DD pattern","value":"^(2[012][0-9][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"}}},
+            "updatedAt": {"dataType":"datetime","required":true},
+            "createdAt": {"dataType":"datetime","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "CreateUserSubscriptionRequestDto": {
+        "dataType": "refObject",
+        "properties": {
+            "customerId": {"dataType":"string","required":true,"validators":{"isString":{"errorMsg":"parameter customerId  must be string"},"minLength":{"errorMsg":"customerId Can not be empty","value":1},"maxLength":{"errorMsg":"Max num of characters is 50","value":50}}},
+            "renewDate": {"dataType":"string","required":true,"validators":{"isString":{"errorMsg":"parameter renewDate is string"},"pattern":{"errorMsg":"Field does not match date YYYY-MM-DD pattern","value":"^(2[012][0-9][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"}}},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "PatchUserSubscriptionRequestDto": {
+        "dataType": "refObject",
+        "properties": {
+            "renewDate": {"dataType":"string","validators":{"isString":{"errorMsg":"parameter renewDate is string"},"pattern":{"errorMsg":"Field does not match date YYYY-MM-DD pattern","value":"^(2[012][0-9][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"}}},
+            "description": {"dataType":"string","validators":{"isString":{"errorMsg":"parameter description  must be string"},"maxLength":{"errorMsg":"Max num of characters is 200","value":200}}},
         },
         "additionalProperties": false,
     },
@@ -159,6 +194,134 @@ export function RegisterRoutes(app: Router) {
     //  NOTE: If you do not see routes for all of your controllers in this file, then you might not have informed tsoa of where to look
     //      Please look into the "controllerPathGlobs" config option described in the readme: https://github.com/lukeautry/tsoa
     // ###########################################################################################################
+        app.get('/api/v1/users/:userId/files',
+            authenticateMiddleware([{"auth0":["read:users"]}]),
+            ...(fetchMiddlewares<RequestHandler>(UserFilesController)),
+            ...(fetchMiddlewares<RequestHandler>(UserFilesController.prototype.getUserFiles)),
+
+            async function UserFilesController_getUserFiles(request: any, response: any, next: any) {
+            const args = {
+                    userId: {"in":"path","name":"userId","required":true,"ref":"UUID"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<UserFilesController>(UserFilesController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
+
+
+              const promise = controller.getUserFiles.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/api/v1/users/:userId/files',
+            authenticateMiddleware([{"auth0":["upload:user-files"]}]),
+            ...(fetchMiddlewares<RequestHandler>(UserFilesController)),
+            ...(fetchMiddlewares<RequestHandler>(UserFilesController.prototype.uploadUserFile)),
+
+            async function UserFilesController_uploadUserFile(request: any, response: any, next: any) {
+            const args = {
+                    userId: {"in":"path","name":"userId","required":true,"ref":"UUID"},
+                    request: {"in":"body","name":"request","required":true,"ref":"PostUserFileRequestDto"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<UserFilesController>(UserFilesController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
+
+
+              const promise = controller.uploadUserFile.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.delete('/api/v1/users/:userId/files/:fileId',
+            authenticateMiddleware([{"auth0":["upload:user-files"]}]),
+            ...(fetchMiddlewares<RequestHandler>(UserFilesController)),
+            ...(fetchMiddlewares<RequestHandler>(UserFilesController.prototype.deleteUserFile)),
+
+            async function UserFilesController_deleteUserFile(request: any, response: any, next: any) {
+            const args = {
+                    userId: {"in":"path","name":"userId","required":true,"ref":"UUID"},
+                    fileId: {"in":"path","name":"fileId","required":true,"ref":"UUID"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<UserFilesController>(UserFilesController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
+
+
+              const promise = controller.deleteUserFile.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.patch('/api/v1/users/:userId/files/:fileId',
+            authenticateMiddleware([{"auth0":["upload:user-files"]}]),
+            ...(fetchMiddlewares<RequestHandler>(UserFilesController)),
+            ...(fetchMiddlewares<RequestHandler>(UserFilesController.prototype.partialUpdateUserFile)),
+
+            async function UserFilesController_partialUpdateUserFile(request: any, response: any, next: any) {
+            const args = {
+                    userId: {"in":"path","name":"userId","required":true,"ref":"UUID"},
+                    fileId: {"in":"path","name":"fileId","required":true,"ref":"UUID"},
+                    request: {"in":"body","name":"request","required":true,"ref":"PatchUserFileRequestDto"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<UserFilesController>(UserFilesController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
+
+
+              const promise = controller.partialUpdateUserFile.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/api/v1/users/:userId',
             authenticateMiddleware([{"auth0":["read:users"]}]),
             ...(fetchMiddlewares<RequestHandler>(UsersController)),
@@ -215,101 +378,6 @@ export function RegisterRoutes(app: Router) {
 
               const promise = controller.getUsers.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, 200, next);
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.get('/api/v1/users/:userId/files',
-            authenticateMiddleware([{"auth0":["read:users"]}]),
-            ...(fetchMiddlewares<RequestHandler>(UsersController)),
-            ...(fetchMiddlewares<RequestHandler>(UsersController.prototype.getUserFiles)),
-
-            async function UsersController_getUserFiles(request: any, response: any, next: any) {
-            const args = {
-                    userId: {"in":"path","name":"userId","required":true,"ref":"UUID"},
-            };
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = getValidatedArgs(args, request, response);
-
-                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
-
-                const controller: any = await container.get<UsersController>(UsersController);
-                if (typeof controller['setStatus'] === 'function') {
-                controller.setStatus(undefined);
-                }
-
-
-              const promise = controller.getUserFiles.apply(controller, validatedArgs as any);
-              promiseHandler(controller, promise, response, undefined, next);
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/api/v1/users/:userId/files',
-            authenticateMiddleware([{"auth0":["upload:user-files"]}]),
-            ...(fetchMiddlewares<RequestHandler>(UsersController)),
-            ...(fetchMiddlewares<RequestHandler>(UsersController.prototype.uploadUserFile)),
-
-            async function UsersController_uploadUserFile(request: any, response: any, next: any) {
-            const args = {
-                    userId: {"in":"path","name":"userId","required":true,"ref":"UUID"},
-                    request: {"in":"body","name":"request","required":true,"ref":"PostUserFileRequestDto"},
-            };
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = getValidatedArgs(args, request, response);
-
-                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
-
-                const controller: any = await container.get<UsersController>(UsersController);
-                if (typeof controller['setStatus'] === 'function') {
-                controller.setStatus(undefined);
-                }
-
-
-              const promise = controller.uploadUserFile.apply(controller, validatedArgs as any);
-              promiseHandler(controller, promise, response, undefined, next);
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.delete('/api/v1/users/:userId/files/:fileId',
-            authenticateMiddleware([{"auth0":["upload:user-files"]}]),
-            ...(fetchMiddlewares<RequestHandler>(UsersController)),
-            ...(fetchMiddlewares<RequestHandler>(UsersController.prototype.deleteUserFile)),
-
-            async function UsersController_deleteUserFile(request: any, response: any, next: any) {
-            const args = {
-                    userId: {"in":"path","name":"userId","required":true,"ref":"UUID"},
-                    fileId: {"in":"path","name":"fileId","required":true,"ref":"UUID"},
-            };
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = getValidatedArgs(args, request, response);
-
-                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
-
-                const controller: any = await container.get<UsersController>(UsersController);
-                if (typeof controller['setStatus'] === 'function') {
-                controller.setStatus(undefined);
-                }
-
-
-              const promise = controller.deleteUserFile.apply(controller, validatedArgs as any);
-              promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);
             }
@@ -378,16 +446,15 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.patch('/api/v1/users/:userId/files/:fileId',
-            authenticateMiddleware([{"auth0":["upload:user-files"]}]),
-            ...(fetchMiddlewares<RequestHandler>(UsersController)),
-            ...(fetchMiddlewares<RequestHandler>(UsersController.prototype.partialUpdateUserFile)),
+        app.post('/api/v1/users/:userId/subscriptions',
+            authenticateMiddleware([{"auth0":["create:profiles"]}]),
+            ...(fetchMiddlewares<RequestHandler>(UsersSubscriptionController)),
+            ...(fetchMiddlewares<RequestHandler>(UsersSubscriptionController.prototype.createUserSubscription)),
 
-            async function UsersController_partialUpdateUserFile(request: any, response: any, next: any) {
+            async function UsersSubscriptionController_createUserSubscription(request: any, response: any, next: any) {
             const args = {
                     userId: {"in":"path","name":"userId","required":true,"ref":"UUID"},
-                    fileId: {"in":"path","name":"fileId","required":true,"ref":"UUID"},
-                    request: {"in":"body","name":"request","required":true,"ref":"PatchUserFileRequestDto"},
+                    request: {"in":"body","name":"request","required":true,"ref":"CreateUserSubscriptionRequestDto"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -398,13 +465,77 @@ export function RegisterRoutes(app: Router) {
 
                 const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
 
-                const controller: any = await container.get<UsersController>(UsersController);
+                const controller: any = await container.get<UsersSubscriptionController>(UsersSubscriptionController);
                 if (typeof controller['setStatus'] === 'function') {
                 controller.setStatus(undefined);
                 }
 
 
-              const promise = controller.partialUpdateUserFile.apply(controller, validatedArgs as any);
+              const promise = controller.createUserSubscription.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/api/v1/users/:userId/subscriptions',
+            authenticateMiddleware([{"auth0":["read:users"]}]),
+            ...(fetchMiddlewares<RequestHandler>(UsersSubscriptionController)),
+            ...(fetchMiddlewares<RequestHandler>(UsersSubscriptionController.prototype.getUserSubscription)),
+
+            async function UsersSubscriptionController_getUserSubscription(request: any, response: any, next: any) {
+            const args = {
+                    userId: {"in":"path","name":"userId","required":true,"ref":"UUID"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<UsersSubscriptionController>(UsersSubscriptionController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
+
+
+              const promise = controller.getUserSubscription.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.patch('/api/v1/users/:userId/subscription/:customerId',
+            authenticateMiddleware([{"auth0":["create:profiles"]}]),
+            ...(fetchMiddlewares<RequestHandler>(UsersSubscriptionController)),
+            ...(fetchMiddlewares<RequestHandler>(UsersSubscriptionController.prototype.patchUserSubscriptions)),
+
+            async function UsersSubscriptionController_patchUserSubscriptions(request: any, response: any, next: any) {
+            const args = {
+                    userId: {"in":"path","name":"userId","required":true,"dataType":"string"},
+                    customerId: {"in":"path","name":"customerId","required":true,"dataType":"string"},
+                    patchDto: {"in":"body","name":"patchDto","required":true,"ref":"PatchUserSubscriptionRequestDto"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const container: IocContainer = typeof iocContainer === 'function' ? (iocContainer as IocContainerFactory)(request) : iocContainer;
+
+                const controller: any = await container.get<UsersSubscriptionController>(UsersSubscriptionController);
+                if (typeof controller['setStatus'] === 'function') {
+                controller.setStatus(undefined);
+                }
+
+
+              const promise = controller.patchUserSubscriptions.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);
