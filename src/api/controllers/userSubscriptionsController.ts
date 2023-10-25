@@ -22,7 +22,7 @@ import {
     }
 
     /** 
-     *@isString Provide valid string
+    *@isString Provide valid string
     @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$ Field does not match UUID pattern
     */
     export type UUID = string;
@@ -37,11 +37,16 @@ import {
     *@maxLength 50 Max num of characters is 50
     */
     customerId : string,
-        /** 
-     *@isString parameter renewDate is string
+    /** 
+    *@isString parameter renewDate is string
     *@pattern ^(2[012][0-9][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$ Field does not match date YYYY-MM-DD pattern
     */ 
-    renewDate : string
+    renewDate? : string,
+    /** 
+    *@isString parameter description  must be string
+    *@maxLength 200 Max num of characters is 200
+    */
+    description? : string,
     }
     export interface PostUserSubscriptionResponseDto{
     id : string,

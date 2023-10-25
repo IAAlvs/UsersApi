@@ -30,7 +30,7 @@ UserSubscriptions.init(
             type : DataTypes.DATEONLY,
             autoIncrement : false, 
             field : "RenewDate",
-            allowNull : false
+            allowNull : true
         },
         description : {
             type: DataTypes.STRING,
