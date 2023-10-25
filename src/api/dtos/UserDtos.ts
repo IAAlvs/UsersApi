@@ -76,7 +76,7 @@ export interface PatchUserFileRequestDto{
 export interface CreateUserSubscription{
     userId : string,
     customerId : string, 
-    renewDate : string
+    renewDate? : string
     description? : string
 }
 export interface PostUserSubscriptionResponseDto{

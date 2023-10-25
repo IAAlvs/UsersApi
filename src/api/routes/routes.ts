@@ -170,7 +170,8 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "customerId": {"dataType":"string","required":true,"validators":{"isString":{"errorMsg":"parameter customerId  must be string"},"minLength":{"errorMsg":"customerId Can not be empty","value":1},"maxLength":{"errorMsg":"Max num of characters is 50","value":50}}},
-            "renewDate": {"dataType":"string","required":true,"validators":{"isString":{"errorMsg":"parameter renewDate is string"},"pattern":{"errorMsg":"Field does not match date YYYY-MM-DD pattern","value":"^(2[012][0-9][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"}}},
+            "renewDate": {"dataType":"string","validators":{"isString":{"errorMsg":"parameter renewDate is string"},"pattern":{"errorMsg":"Field does not match date YYYY-MM-DD pattern","value":"^(2[012][0-9][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"}}},
+            "description": {"dataType":"string","validators":{"isString":{"errorMsg":"parameter description  must be string"},"maxLength":{"errorMsg":"Max num of characters is 200","value":200}}},
         },
         "additionalProperties": false,
     },

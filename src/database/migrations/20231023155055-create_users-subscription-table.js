@@ -27,7 +27,7 @@ module.exports = {
       },
       renewDate: {
         type: Sequelize.DATEONLY,
-        allowNull: false,
+        allowNull: true,
         field : "RenewDate"
 
       },
