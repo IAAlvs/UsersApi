@@ -5,8 +5,11 @@ import {
     PatchUserRequestDto, 
     PostUserFileRequestDto, 
     PostUserFileResponseDto,
-    PatchUserFileRequestDto } from "@/api/dtos/UserDtos";
-import { FileDto } from "../controllers/userController";
+    PatchUserFileRequestDto, 
+    CreateUserSubscription,
+    PostUserSubscriptionResponseDto,
+    PatchUserSubscriptionRequestDto} from "@/api/dtos/UserDtos";
+import { FileDto } from "../controllers/userFilesController";
 
 export interface UserServiceInterface{
     getUsers() : Promise<GetUserResponseDto[]>,
@@ -17,5 +20,7 @@ export interface UserServiceInterface{
     createUser(requestDto: CreateUserRequestDto) : Promise<GetUserResponseDto>,
     partialUpdateUser(userId : string, updateUserDto: PatchUserRequestDto):Promise<GetUserResponseDto>,
     partialUpdateUserFile(userId : string,fileId : string, updateUserFileDto: PatchUserFileRequestDto):Promise<FileDto>
-
+    createUserSubscription(subscriptionDto : CreateUserSubscription): Promise<PostUserSubscriptionResponseDto>
+    getUserSubscriptions(userId : string) : Promise<PostUserSubscriptionResponseDto[]>
+    patchUserSubscription(userId : string, customerId : string, patchDto : PatchUserSubscriptionRequestDto) : Promise<PostUserSubscriptionResponseDto>
 }
