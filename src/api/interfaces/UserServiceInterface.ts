@@ -23,4 +23,6 @@ export interface UserServiceInterface{
     createUserSubscription(subscriptionDto : CreateUserSubscription): Promise<PostUserSubscriptionResponseDto>
     getUserSubscriptions(userId : string) : Promise<PostUserSubscriptionResponseDto[]>
     patchUserSubscription(userId : string, customerId : string, patchDto : PatchUserSubscriptionRequestDto) : Promise<PostUserSubscriptionResponseDto>
+    updateBeatenSubscriptions(): Promise<void>,    
+    updateBeatenTemporalyFiles(): Promise<void>
 }

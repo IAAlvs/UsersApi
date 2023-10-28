@@ -4,16 +4,21 @@ import { sequelize } from "../../../src/database/sequelize.config.js";
 import { User } from "../../../src/api/models/user";
 import { UserFiles } from "../../../src/api/models/user-file";
 import {getTestToken, configureEnvv} from "../utils/generateTestPayload";
+/* DONT CHANGE TO IMPORT !!!! */
 const authDependency =  require("../../../src/api/middlewares/Authorization/AuthorizationMiddleware");
 import { JsonWebTokenError } from "jsonwebtoken";
-import { CreateUserResponseDto } from "@/api/controllers/userController";
+import { CreateUserResponseDto } from "../../../src/api/controllers/userController";
 import { PatchUserFileRequestDto } from "@/api/dtos/UserDtos";
-
+import { iocContainer } from "../../../src/api/aspects/inversify.config";
+import TYPES from "../../../src/api/interfaces/ServiceTypes";
+import { UserServiceInterface } from "../../../src/api/interfaces/UserServiceInterface";
+import { IocContainer } from "tsoa";
+import { addDays } from "../utils/dates";
+import crypto from "crypto";
+import { UserSubscriptions } from "../../../src/api/models/users-subscription";
 
 // Mock the 'database.js' module that imports Sequelize
 //change environment to test
-let token:string; 
-let configureEnv:Record<string, object>;
 describe('Integration Tests', () => {
   beforeAll(async () =>{
     configureEnvv();
@@ -1179,5 +1184,166 @@ describe('Integration Tests', () => {
     expect(authDependency.expressAuthentication).toHaveBeenCalledTimes(1);
     expect(response.status).toBe(422);
   });
+  //ENDPOINT RENEW SERVICES
+
+  test('WithAuthentication_renewBeatenServices_Success', async () => {
+
+    const scopes = ["global:users"];
+    const token = JSON.stringify(getTestToken(scopes)); 
+
+    const response = await request(app).post(`/api/v1/users/cron`).
+    set('Authorization', `Bearer ${token}`);
+
+    expect(response.status).toBe(200);
+  });
+  
+  test('WithoutAuthentication_renewBeatenServices_Forbidden', async () => {
+
+    const scopes = ["fake:scope"];
+    const token = JSON.stringify(getTestToken(scopes)); 
+
+    const response = await request(app).post(`/api/v1/users/cron`).
+    set('Authorization', `Bearer ${token}`);
+
+    expect(response.status).toBe(401);
+  });
+
+  describe("Mocking and error in userservice", ()=>{
+    let update: jest.SpyInstance<Promise<void>, [], any>;
+    beforeAll(async()=>{
+      update = jest.spyOn(iocContainer.get<UserServiceInterface>(TYPES.UserServiceInterface),"updateBeatenSubscriptions");
+      update.mockImplementation(() => {
+        throw new Error("Update in db error at update users subscriptions");
+      });
+      // If error happens in subscriptions, update to user files must still running 
+      let todayLess2Days = addDays(new Date(), -2);
+      const userToAdd = {
+        id : 'f61762bb-38b7-4611-837f-1db2116b6df9',
+        authId : 'f61762bb-38b7-4611-837f-1db2116b6df9',
+        email : "emailtests@gmail.com",
+        emailVerified : true, 
+        picture : "pictureUrl",
+        name: 'John',
+        lastName: 'Doe',
+        secondLastName: 'Doe2',
+        age : 50, 
+        address : "Address example"
+      }
+      const fileToAdd = {
+        userId : "f61762bb-38b7-4611-837f-1db2116b6df9",
+        fileId : "f61762bb-38b7-4611-837f-1db2116b6df9",
+        fileName : "fileName",
+        fileSize : 10101,
+        fileType : "pdf",
+        dropDate : todayLess2Days.toISOString().split("T")[0],
+        visible : true, 
+        createdAt : new Date(),
+        updatedAt : new Date()
+      }
+      await User.create(userToAdd);
+      await UserFiles.create(fileToAdd);
+    });
+    afterAll(async ()=>{
+      update.mockRestore();
+        await UserFiles.destroy({where: {fileId : "f61762bb-38b7-4611-837f-1db2116b6df9"}});
+        await User.destroy({where: {id : "f61762bb-38b7-4611-837f-1db2116b6df9"}});
+    })
+    test('WithAuthenticationButDbErrorUdp_renewBeatenServices_Conflict-Subscritions-', async () => {
+      const errorReturned = "Update in db error at update users subscriptions"
+      const scopes = ["global:users"];
+      const token = JSON.stringify(getTestToken(scopes)); 
+  
+      const response = await request(app).post(`/api/v1/users/cron`).
+      set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(409);
+      expect(response.body.message).toBe(errorReturned)
+    });
+    test('CronTaks_ErrorAtUpdateUserSubscriptions_SameWayUserFilesUpdated', async () => {
+      const errorReturned = "Update in db error at update users subscriptions"
+      const scopesToGetUserFiles = ["read:users"];
+      const scopesToCron = ["global:users"];
+      const token = JSON.stringify(getTestToken(scopesToCron)); 
+      const tokenUserfiles = JSON.stringify(getTestToken(scopesToGetUserFiles)); 
+  
+      const response = await request(app).post(`/api/v1/users/cron`).
+      set('Authorization', `Bearer ${token}`);
+      const userFiles = await request(app).get(`/api/v1/users/f61762bb-38b7-4611-837f-1db2116b6df9/files`).
+      set('Authorization', `Bearer ${tokenUserfiles}`);
+      const fileUpdated = userFiles.body.files[0];
+
+      expect(fileUpdated.visible).toBe(false);
+      expect(userFiles.status).toBe(200);
+      expect(response.status).toBe(409);
+      expect(response.body.message).toBe(errorReturned)
+    });
+  })
+  describe("Mocking certain parts of userService", ()=>{
+    let update: jest.SpyInstance<Promise<void>, [], any>;
+    beforeAll(async()=>{
+      update = jest.spyOn(iocContainer.get<UserServiceInterface>(TYPES.UserServiceInterface),"updateBeatenTemporalyFiles");
+      update.mockImplementation(() => {
+        throw new Error("Error in db at update user files");
+      });
+      let todayLess2Days = addDays(new Date(), -2);
+      const userToAdd = {
+        id : 'f61762bb-38b7-4611-837f-1db2116b6df9',
+        authId : 'f61762bb-38b7-4611-837f-1db2116b6df9',
+        email : "emailtests@gmail.com",
+        emailVerified : true, 
+        picture : "pictureUrl",
+        name: 'John',
+        lastName: 'Doe',
+        secondLastName: 'Doe2',
+        age : 50, 
+        address : "Address example"
+      }
+      const subscription = {
+        id:"e61762bb-38b7-4611-837f-1db2116b6df9",
+        userId : "f61762bb-38b7-4611-837f-1db2116b6df9",
+        customerId : "f61762bb-38b7",
+        description:"PLUS",
+        renewDate : todayLess2Days.toISOString().split("T")[0]
+      }
+      await User.create(userToAdd);
+      await UserSubscriptions.create(subscription);
+    });
+    afterAll(async()=>{
+      update.mockRestore();
+      await UserSubscriptions.destroy({where:{id:"e61762bb-38b7-4611-837f-1db2116b6df9"}});
+      await User.destroy({where:{id:"f61762bb-38b7-4611-837f-1db2116b6df9"}});
+    })
+    test('WithAuthenticationButDbErrorUdp_renewBeatenServices_Conflict-TemporalyFiles-', async () => {
+      const errorReturned = "Error in db at update user files";
+      const scopes = ["global:users"];
+      const token = JSON.stringify(getTestToken(scopes)); 
+  
+      const response = await request(app).post(`/api/v1/users/cron`).
+      set('Authorization', `Bearer ${token}`);
+  
+      expect(response.status).toBe(409);
+      expect(response.body.message).toContain(errorReturned)
+    });
+    test('CronTaks_ErrorAtUpdateUserFiles_SameWayUserSubscriptionUpdated', async () => {
+      const errorReturned = "Error in db at update user files"
+      const scopesToGetUserFiles = ["read:users"];
+      const scopesToCron = ["global:users"];
+      const token = JSON.stringify(getTestToken(scopesToCron)); 
+      const tokenUserSubscriptions = JSON.stringify(getTestToken(scopesToGetUserFiles)); 
+  
+      const response = await request(app).post(`/api/v1/users/cron`).
+      set('Authorization', `Bearer ${token}`);
+      const userSubscriptions = await request(app).get(`/api/v1/users/f61762bb-38b7-4611-837f-1db2116b6df9/subscriptions`).
+      set('Authorization', `Bearer ${tokenUserSubscriptions}`);
+      const subscripionUpdated = userSubscriptions.body[0];
+
+      expect(response.status).toBe(409);
+      expect(response.body.message).toBe(errorReturned)
+      expect(subscripionUpdated.description).toBe("Free");
+      expect(userSubscriptions.status).toBe(200);
+
+    });
+
+  })
 
 });

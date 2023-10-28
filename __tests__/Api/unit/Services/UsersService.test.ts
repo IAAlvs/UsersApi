@@ -10,7 +10,7 @@ import { CreateUserRequestDto, CreateUserSubscription, GetUserFilesDtoResponse, 
 import { PatchUserRequestDto } from "../../../../src/api/dtos/UserDtos"
 import crypto from "crypto";
 import { PatchUserSubscriptionRequestDto } from "@/api/controllers/userSubscriptionsController";
-
+import {addDays} from "../../utils/dates";
 let _userService : UserServiceInterface;
 const datesAreEqualWithinRange = (date1: Date, date2 : Date) => {
   const differenceInSeconds = Math.abs(date1.getTime() - date2.getTime()) / 1000;
@@ -672,4 +672,48 @@ describe('User Service Tests', () => {
 
       await expect(updateSubscriptionCb).rejects.toThrow(ReferenceError)
     });
+
+
+    /* TIMEO OUT SERVICES TEST */
+    test("WithFileWithADropDateBeaten_timeOutServices_FileNotVisible", async ()=>{
+      const fileToAdd = {
+        userId : '61ad624c-7233-4839-8ece-49fe0e3041ce',
+        fileId : '62ad624c-7233-4839-8ece-49fe0e3041re',
+        fileName : "fileName",
+        fileSize : 10101,
+        fileType : "pdf",
+        dropDate : addDays(new Date(), -2).toISOString().split("T")[0],
+        visible : true, 
+        createdAt : new Date(),
+        updatedAt : new Date()
+      }
+
+      await _userService.uploadUserFile(fileToAdd.userId,fileToAdd);
+      await _userService.updateBeatenTemporalyFiles();
+
+      const userFiles = await _userService.getUserFiles(fileToAdd.userId);
+
+      const filesBeaten = userFiles!.files.
+      find(s => s.id === fileToAdd.fileId); 
+
+      expect(filesBeaten?.visible).toBe(false)
+    })
+
+    test("WithFileWithADropDateBeaten_timeOutServices_FileNotVisible", async ()=>{
+      const subscription = {
+        userId : '52ad624c-7233-4839-8ece-49fe0e3041be',
+        customerId : "customertest321-beaten",
+        renewDate : addDays(new Date(), -2).toISOString().split("T")[0],
+        description : "PLUS SUBSCRIPTION"
+      }
+      await _userService.createUserSubscription(subscription);
+      await _userService.updateBeatenSubscriptions();
+      const userSubscriptions = await _userService.getUserSubscriptions(subscription.userId);
+
+      const subscriptionBeaten = userSubscriptions.
+      find(s => s.userId ===subscription.userId&& s.customerId === subscription.customerId); 
+
+      expect(subscriptionBeaten?.description).toBe("Free")
+
+    })
 });

@@ -267,4 +267,37 @@ export class UserService implements UserServiceInterface {
     await subscription.update(updatedFields);
     return subscription.dataValues;
   }
+  public async updateBeatenSubscriptions(): Promise<void> {
+    const today = new Date();
+    const todayStr = today.toISOString().split("T")[0];
+    await UserSubscriptions.update(
+    {
+      renewDate : null,
+      description : "Free"
+    },
+    {
+      where : {
+        renewDate : {
+          [Op.lt]: todayStr
+        }
+      }
+    }); 
+  }
+  public async updateBeatenTemporalyFiles(): Promise<void> {
+    const today = new Date();
+    /* We add a day to avoid confusion with timezones */
+    const todayStr = today.toISOString().split("T")[0];
+
+    await UserFiles.update(
+    {
+      visible : false
+    },
+    {
+      where : {
+        dropDate : {
+          [Op.lt]: todayStr
+        }
+      }
+    }); 
+  }
 }
