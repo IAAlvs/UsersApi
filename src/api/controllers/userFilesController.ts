@@ -4,17 +4,17 @@ import {inject, injectable } from "inversify";
 import { UserServiceInterface } from '../interfaces/UserServiceInterface';
 import TYPES from '../interfaces/ServiceTypes';
 import {
-  Controller,
-  Get,
-  Path,
-  Route,
-  Response,
-  Security,
-  Body,
-  Post,
-  Patch,
-  Delete,
-  Tags} from "tsoa";
+    Controller,
+    Get,
+    Path,
+    Route,
+    Response,
+    Security,
+    Body,
+    Post,
+    Patch,
+    Delete,
+    Tags} from "tsoa";
 export interface UserFilesControllerInterface{
     getUserFiles(userId: UUID): Promise<GetUserFilesDtoResponse | ErrorResponse>,
     uploadUserFile(userId: UUID,request : PostUserFileRequestDto): Promise<PostUserFileResponseDto | ErrorResponse>,

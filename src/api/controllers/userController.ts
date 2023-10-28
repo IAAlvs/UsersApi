@@ -20,7 +20,7 @@ export interface UserControllerInterface{
     getUser(userId: UUID, validator?: any): Promise<GetUserResponseDto | ErrorResponse>,
     getUsers(): Promise<GetUserResponseDto[] | ErrorResponse>,
     partialUpdateUser(userId : UUID, request : PatchUserRequestDto): Promise<GetUserResponseDto | ErrorResponse>
-
+    renewBeatenServices() : Promise<ControllerResponse | ErrorResponse>
   }
 
 /** 
@@ -141,6 +141,9 @@ export interface CreateUserResponseDto{
   email : string,
   status : string
 
+}
+export interface ControllerResponse{
+  message : string
 }
 export interface CreateUserSubscriptionRequestDto{
   /** 
@@ -310,4 +313,46 @@ export class UsersController extends Controller implements UserControllerInterfa
       return errorResponse;
     }
   }
+  private async executePromisesInOrder(promisesArray : {(): Promise<void>}[]):Promise<string []> {
+    const results = [];
+  
+    for (const promiseFunction of promisesArray) {
+      try {
+        await promiseFunction();
+      } 
+      catch (error) {
+        //console.error(error);
+        if(error instanceof Error){
+          results.push(error.message);
+        }
+      }
+    }
+    return results;
+  }
+  @Security("auth0", ["global:users"])
+  @Post("users/cron")
+  @SuccessResponse("200", "Ok")
+  @Response(409, 'Conflict')
+  @Response<ErrorResponse>(400, "Bad request")
+  @Response(500, "Server Error")
+  public async renewBeatenServices(): Promise<ControllerResponse> {
+    
+    var updatePromises:{(): Promise<void>}[]  = [
+      this._userService.updateBeatenSubscriptions,
+      this._userService.updateBeatenTemporalyFiles
+    ];
+    const arrayErrors = await this.executePromisesInOrder(updatePromises);  
+  
+    if (arrayErrors.length > 0) {
+      this.setStatus(409);
+      return {
+        message: arrayErrors.join("\n"),
+      };
+    }
+    this.setStatus(200);
+    return {
+      message: "success",
+    };
+  }
+  
 }

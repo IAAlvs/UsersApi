@@ -163,7 +163,7 @@ import {
         return errorResponse;
         }
     }
-    @Patch("users/{userId}/subscription/{customerId}")
+    @Patch("users/{userId}/subscriptions/{customerId}")
     @Security("auth0",["create:profiles"])
     @Response(401, 'UnAuthorized')
     @Response(409, 'Conflict')
